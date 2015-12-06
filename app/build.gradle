@@ -1,5 +1,20 @@
 apply plugin: 'com.android.model.application'
 
+task compileNdkExec(type: Exec) {
+    commandLine 'ndk-build', '-C', file('exec').absolutePath
+
+    doLast {
+        file("exec/libs/armeabi/iomerge") renameTo file("src/arm/assets/iomerge")
+        file("exec/libs/arm64-v8a/iomerge") renameTo file("src/arm8/assets/iomerge")
+        file("exec/libs/armeabi-v7a/iomerge") renameTo file("src/arm7/assets/iomerge")
+        file("exec/libs/x86/iomerge") renameTo file("src/x86/assets/iomerge")
+        file("exec/libs/x86_64/iomerge") renameTo file("src/x86-64/assets/iomerge")
+        file("exec/libs/mips/iomerge") renameTo file("src/mips/assets/iomerge")
+        file("exec/libs/mips64/iomerge") renameTo file("src/mips-64/assets/iomerge")
+    }
+}
+tasks.build.dependsOn(compileNdkExec);
+
 model {
     android {
         compileSdkVersion = 23
@@ -26,8 +41,6 @@ model {
     }
 
     android.productFlavors {
-        // for detailed abiFilter descriptions, refer to "Supported ABIs" @
-        // https://developer.android.com/ndk/guides/abis.html#sa
         create("arm") {
             ndk.abiFilters.add("armeabi")
         }
@@ -49,8 +62,6 @@ model {
         create("mips-64") {
             ndk.abiFilters.add("mips64")
         }
-        // To include all cpu architectures, leaves abiFilters empty
-        create("all")
     }
 }
 
