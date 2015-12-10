@@ -62,7 +62,26 @@ obj/local/armeabi-v7a/objs-debug/iomerge/main.o: jni/main.cpp \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/user.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/sysconf.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/pathconf.h \
- jni/IOManager.h \
+ /opt/android-ndk/sources/cxx-stl/stlport/stlport/stdio.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/../include/stdio.h \
+ /opt/android-ndk/sources/cxx-stl/stlport/stlport/stdarg.h \
+ /opt/android-ndk/sources/cxx-stl/stlport/stlport/stdlib.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/../include/stdlib.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/alloca.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/strings.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/memory.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/socket.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/socket.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm/fcntl.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm-generic/fcntl.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm/socket.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm-generic/socket.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm/sockios.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm-generic/sockios.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/sockios.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/uio.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/un.h \
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/un.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/uinput.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/input.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/ioctl.h \
@@ -77,7 +96,8 @@ obj/local/armeabi-v7a/objs-debug/iomerge/main.o: jni/main.cpp \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm/ioctls.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm-generic/ioctls.h \
  /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/ioctl_compat.h \
- /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/tty.h
+ /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/tty.h \
+ jni/IOManager.h
 
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/unistd.h:
 
@@ -205,7 +225,45 @@ obj/local/armeabi-v7a/objs-debug/iomerge/main.o: jni/main.cpp \
 
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/pathconf.h:
 
-jni/IOManager.h:
+/opt/android-ndk/sources/cxx-stl/stlport/stlport/stdio.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/../include/stdio.h:
+
+/opt/android-ndk/sources/cxx-stl/stlport/stlport/stdarg.h:
+
+/opt/android-ndk/sources/cxx-stl/stlport/stlport/stdlib.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/../include/stdlib.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/alloca.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/strings.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/memory.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/socket.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/socket.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm/fcntl.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm-generic/fcntl.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm/socket.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm-generic/socket.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm/sockios.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/asm-generic/sockios.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/sockios.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/uio.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/un.h:
+
+/opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/un.h:
 
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/uinput.h:
 
@@ -236,3 +294,5 @@ jni/IOManager.h:
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/sys/ioctl_compat.h:
 
 /opt/android-ndk/platforms/android-21/arch-arm/usr/include/linux/tty.h:
+
+jni/IOManager.h:

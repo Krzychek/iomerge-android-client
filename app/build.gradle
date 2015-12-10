@@ -37,7 +37,8 @@ model {
     }
 
     android.ndk {
-        moduleName = "native";
+        moduleName = "native"
+        stl = "stlport_static"
     }
 
     android.productFlavors {
@@ -67,7 +68,8 @@ model {
 
 
 dependencies {
-    compile fileTree(include: ["*.jar"], dir: "libs")
-    compile "com.android.support:appcompat-v7:23.1.1"
-    compile "com.android.support:design:23.1.1"
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile files('libs/lipermi-1.0.1.jar')
+    compile files('libs/iomerge-model-1.0-SNAPSHOT.jar')
 }

@@ -8,9 +8,7 @@ class IOManager {
 public:
     IOManager(bool useKbd, bool useMouse);
     ~IOManager();
-    void moveMouse(int x, int y);
-    void typeKey(int key);
-
+    void handleMsg(struct input_event &event);
 
 private:
     bool kbdEnabled, mouseEnabled;
