@@ -1,39 +1,53 @@
 package org.kbieron.iomerge.android;
 
+import android.util.Log;
 import android.view.KeyEvent;
 
 import java.io.IOException;
 
-import pl.kbieron.iomerge.model.RMIRemote;
+import pl.kbieron.iomerge.iLipeRMI.IClient;
+import pl.kbieron.iomerge.model.ClientAction;
 
-public class IOManager implements RMIRemote {
+public class IOManager implements IClient {
 
-    public native void moveMouse(int x, int y);
+    static {
+        System.loadLibrary("native");
+    }
 
-    public native void mouseClick(int x, int y);
-
-    public void emitKeyEvent(int event) {
-
-        String keyCommand = "input keyevent " + event;
-        Runtime runtime = Runtime.getRuntime();
-        try {
-            runtime.exec(new String[] {"su", " -C" ,keyCommand, });
-        } catch (IOException e) {
-            e.printStackTrace();
+    @Override
+    public void action(ClientAction clientAction) {
+        switch (clientAction) {
+            case HOME_BTN:
+                emitKeyEvent(KeyEvent.KEYCODE_HOME);
+                break;
+            case BACK_BTN:
+                emitKeyEvent(KeyEvent.KEYCODE_BACK);
+                break;
+            case MENU_BTN:
+                emitKeyEvent(KeyEvent.KEYCODE_BACK);
+                break;
+            case MOUSE_PRESSED:
+                // TODO
+                break;
+            case MOUSE_RELEASED:
+                // TODO
+                break;
+            case MOUSE_CLICK:
+                // TODO
+                break;
         }
     }
 
     @Override
-    public void hitBackBtn() {
-        emitKeyEvent(KeyEvent.KEYCODE_HOME);
-    }
+    public native void moveMouse(int x, int y);
 
-    @Override
-    public void hitHomeBtn() {
-        emitKeyEvent(KeyEvent.KEYCODE_BACK);
-    }
+    private void emitKeyEvent(int event) {
+        String[] execParams = {"su", " -C", "input keyevent " + event};
 
-    static {
-        System.loadLibrary("native");
+        try {
+            Runtime.getRuntime().exec(execParams);
+        } catch (IOException e) {
+            Log.e("IOManage", "Unable to run ", e);
+        }
     }
 }

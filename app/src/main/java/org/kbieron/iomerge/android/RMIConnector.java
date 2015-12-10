@@ -8,8 +8,8 @@ import net.sf.lipermi.net.Client;
 
 import java.io.IOException;
 
-import pl.kbieron.iomerge.model.RMIRemote;
-import pl.kbieron.iomerge.model.RMIServerIface;
+import pl.kbieron.iomerge.iLipeRMI.IClient;
+import pl.kbieron.iomerge.iLipeRMI.IServer;
 
 public class RMIConnector {
     public RMIConnector() {
@@ -20,10 +20,10 @@ public class RMIConnector {
                     CallHandler callHandler = new CallHandler();
 
                     IOManager exportedObject = new IOManager();
-                    callHandler.exportObject(RMIRemote.class, exportedObject);
+                    callHandler.exportObject(IClient.class, exportedObject);
 
-                    RMIServerIface rmiServerIface = (RMIServerIface) new Client("192.168.1.135", 7777, callHandler).getGlobal(RMIServerIface.class);
-                    rmiServerIface.setRemote(exportedObject);
+                    IServer server = (IServer) new Client("192.168.1.135", 7777, callHandler).getGlobal(IServer.class);
+                    server.setClient(exportedObject, 400, 400);
 
                 } catch (IOException | LipeRMIException e) {
                     e.printStackTrace();
