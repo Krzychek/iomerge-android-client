@@ -1,56 +1,42 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/stat.h>
+#include <jni.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <linux/uinput.h>
 #include "IOManager.h"
 
-int make_named_socket();
+/*---------- predeclared shared functions ----------*/
+FILE* get_fifo();
 
-const char name[] = "/data/data/org.kbieron.iomerge.android/daemon-socket";
+void send_event(struct input_event &event);
 
+/*---------- constants ----------*/
+const char NAME[] = "/data/local/tmp/iomerge_fifo";
 
 int main() {
-    int socketId = make_named_socket();
     struct input_event event;
     IOManager ioManager(false, true);
 
-    while (1) {
-        int recv_len = recvfrom(socketId, &event, sizeof(event), 0, NULL, NULL);
+    FILE *fp;
+    char readbuf[80];
 
-        if (recv_len == -1) {
-            printf("Kucze kucze, to chyba jakiś błąd!!");
-            fflush(stdout);
-        }
+    /* Create the FIFO if it does not exist */
+    umask(0);
+    mknod(NAME, S_IFIFO|0666, 0);
+    printf("created fifo");
+    fflush(stdout);
 
-        ioManager.handleMsg(event);
-
+    while(1)
+    {
+        fp = fopen(NAME, "r");
+        fgets(readbuf, 80, fp);
+        printf("Received string: %s\n", readbuf);
+        fflush(stdout);
+        fclose(fp);
     }
 }
 
-int make_named_socket() {
-    struct sockaddr_un addr;
-    int sock;
-    size_t size;
-
-    /* Create the socket. */
-    sock = socket(AF_LOCAL, SOCK_DGRAM, 0);
-    if (sock < 0) {
-        printf("socket");
-        fflush(stdout);
-        exit(EXIT_FAILURE);
-    }
-
-    /* Bind a name to the socket. */
-    addr.sun_family = AF_LOCAL;
-    memcpy(addr.sun_path, name, sizeof(name));
-
-    if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-        printf("bind");
-        fflush(stdout);
-        exit(EXIT_FAILURE);
-    }
-
-    return sock;
-}

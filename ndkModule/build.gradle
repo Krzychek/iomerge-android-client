@@ -48,7 +48,6 @@ model {
 
     android.ndk {
         moduleName = "native"
-        stl = "stlport_static"
     }
 
 }

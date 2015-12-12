@@ -11,12 +11,17 @@ import pl.kbieron.iomerge.iLipeRMI.IClient;
 import pl.kbieron.iomerge.model.ClientAction;
 
 
-@EBean
+@EBean(scope = EBean.Scope.Singleton)
 public class IOManager implements IClient {
 
     static {
         System.loadLibrary("native");
     }
+
+    @Override
+    public native void moveMouse(int x, int y);
+
+    public native void stop();
 
     @Override
     public void action(ClientAction clientAction) {
@@ -42,9 +47,6 @@ public class IOManager implements IClient {
         }
     }
 
-    @Override
-    public native void moveMouse(int x, int y);
-
     private void emitKeyEvent(int event) {
         String[] execParams = {"su", " -C", "input keyevent " + event};
 
@@ -54,6 +56,4 @@ public class IOManager implements IClient {
             Log.e("IOManage", "Unable to run ", e);
         }
     }
-
-    public native void stop();
 }
