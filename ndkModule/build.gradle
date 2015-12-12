@@ -13,13 +13,14 @@ task compileNdkExec(type: Exec) {
     commandLine 'ndk-build', '-C', file('exec').absolutePath
 
     doLast {
-        file("exec/libs/armeabi/iomerge") renameTo file("src/arm/assets/iomerge")
-        file("exec/libs/arm64-v8a/iomerge") renameTo file("src/arm8/assets/iomerge")
-        file("exec/libs/armeabi-v7a/iomerge") renameTo file("src/arm7/assets/iomerge")
-        file("exec/libs/x86/iomerge") renameTo file("src/x86/assets/iomerge")
-        file("exec/libs/x86_64/iomerge") renameTo file("src/x86-64/assets/iomerge")
-        file("exec/libs/mips/iomerge") renameTo file("src/mips/assets/iomerge")
-        file("exec/libs/mips64/iomerge") renameTo file("src/mips-64/assets/iomerge")
+        file("exec/libs/armeabi/iomerge") renameTo file("src/main/assets/iomerge")
+//        file("exec/libs/armeabi/iomerge") renameTo file("src/arm/assets/iomerge")
+//        file("exec/libs/arm64-v8a/iomerge") renameTo file("src/arm8/assets/iomerge")
+//        file("exec/libs/armeabi-v7a/iomerge") renameTo file("src/arm7/assets/iomerge")
+//        file("exec/libs/x86/iomerge") renameTo file("src/x86/assets/iomerge")
+//        file("exec/libs/x86_64/iomerge") renameTo file("src/x86-64/assets/iomerge")
+//        file("exec/libs/mips/iomerge") renameTo file("src/mips/assets/iomerge")
+//        file("exec/libs/mips64/iomerge") renameTo file("src/mips-64/assets/iomerge")
     }
 }
 tasks.build.dependsOn(compileNdkExec);
@@ -50,29 +51,6 @@ model {
         stl = "stlport_static"
     }
 
-    android.productFlavors {
-        create("arm") {
-            ndk.abiFilters.add("armeabi")
-        }
-        create("arm7") {
-            ndk.abiFilters.add("armeabi-v7a")
-        }
-        create("arm8") {
-            ndk.abiFilters.add("arm64-v8a")
-        }
-        create("x86") {
-            ndk.abiFilters.add("x86")
-        }
-        create("x86-64") {
-            ndk.abiFilters.add("x86_64")
-        }
-        create("mips") {
-            ndk.abiFilters.add("mips")
-        }
-        create("mips-64") {
-            ndk.abiFilters.add("mips64")
-        }
-    }
 }
 dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'

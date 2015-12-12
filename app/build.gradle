@@ -15,7 +15,6 @@ apply plugin: 'android-apt'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "org.kbieron.iomerge"
         minSdkVersion 15
@@ -49,10 +48,8 @@ dependencies {
 
     compile 'pl.kbieron:iomerge-model:1.0-SNAPSHOT'
     compile 'com.tascape.qa:lipermi:1.0.1'
-
     apt "org.androidannotations:androidannotations:4.0-SNAPSHOT"
     compile 'org.androidannotations:androidannotations-api:4.0-SNAPSHOT'
-
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:support-v4:23.1.1'
