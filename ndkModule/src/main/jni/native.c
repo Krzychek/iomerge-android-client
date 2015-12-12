@@ -2,46 +2,68 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <linux/uinput.h>
+#include <sys/stat.h>
 
-/*---------- predeclared shared functions ----------*/
-FILE* get_fifo();
-
-void send_event(struct input_event *event);
-
-/*---------- constants ----------*/
-const char NAME[] = "/data/local/tmp/iomerge_fifo";
+struct my_event {
+    int type;
+    int code;
+    int value;
+};
 
 
-/*---------- JNI functions ----------*/
+/*------------ declare functions ------------*/
+void send_event(struct my_event* event);
+
+void start();
+
+void stop();
+
+/*---------------- constants ----------------*/
+const char NAME[] = "/data/data/org.kbieron.iomerge/cache/iomerge_fifo";
+
+/*----------------- globals -----------------*/
+FILE* fp;
+
+
+
+/*-------------- JNI functions --------------*/
 JNIEXPORT void JNICALL Java_org_kbieron_iomerge_rmi_IOManager_moveMouse(JNIEnv* env, jobject instance, jint x, jint y) {
-    struct input_event event;
-    event.type = KEY_DOWN;
-    // TODO bla bla..
-    send_event(&event);
+    mknod(NAME, S_IFIFO | 0666, 0);
+
+    struct my_event event[2];
+
+    memset(&event, 0, sizeof(struct my_event));
+
+    // send x
+    event[0].type = EV_REL;
+    event[0].code = REL_X;
+    event[0].value = x;
+
+    // send y
+    event[1].type = EV_REL;
+    event[1].code = REL_Y;
+    event[1].value = y;
+
+    send_event(event);
 }
 
 JNIEXPORT void JNICALL Java_org_kbieron_iomerge_rmi_IOManager_stop(JNIEnv* env, jobject instance) {
 }
 
-/*---------- shared functions implementation ----------*/
-void send_event(struct input_event *event) {
-    FILE* fp = get_fifo();
-
-    fputs("blabla", fp);
-
-    fclose(fp);
+/*------------ implement functions ------------*/
+void send_event(struct my_event* event) {
+    start();
+    fwrite(event, sizeof(struct my_event), 2, fp);
+    stop();
 }
 
-
-FILE* get_fifo() {
-    static FILE* fp = NULL;
-
-    if (fp != NULL) return fp;
-
-    if ((fp = fopen(NAME, "w")) == NULL) {
+void start() {
+    if ((fp = fopen(NAME, "wb")) == NULL) {
         perror("fopen");
         exit(1);
     }
+}
 
-    return fp;
+void stop() {
+    fclose(fp);
 }

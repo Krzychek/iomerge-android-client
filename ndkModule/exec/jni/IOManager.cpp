@@ -7,7 +7,8 @@
 #include "IOManager.h"
 
 #define die(str, args...) do { \
-            perror(str); \
+            printf(str); \
+            fflush(stdout);\
             exit(EXIT_FAILURE); \
         } while(0)
 
@@ -36,6 +37,19 @@ IOManager::IOManager(bool useKbd, bool useMouse) : kbdEnabled(useKbd), mouseEnab
     if (ioctl(fd, UI_DEV_CREATE) < 0)
         die("error: ioctl");
 
+    // setup event prototypes
+    event_size = sizeof(struct input_event);
+
+    memset(&event_x, 0, event_size);
+    event_x.type = EV_REL;
+    event_x.code = REL_X;
+
+    memset(&event_y, 0, event_size);
+    event_y.type = EV_REL;
+    event_y.code = REL_Y;
+
+    memset(&event_sync, 0, event_size);
+    event_sync.type = EV_SYN;
 }
 
 IOManager::~IOManager() {
@@ -57,6 +71,8 @@ void IOManager::initializeMouse() {
             die("error: ioctl");
         if (ioctl(fd, UI_SET_KEYBIT, BTN_LEFT) < 0)
             die("error: ioctl");
+        if (ioctl(fd, UI_SET_KEYBIT, BTN_RIGHT) < 0)
+            die("error: ioctl");
 
         if (ioctl(fd, UI_SET_EVBIT, EV_REL) < 0)
             die("error: ioctl");
@@ -65,13 +81,35 @@ void IOManager::initializeMouse() {
         if (ioctl(fd, UI_SET_RELBIT, REL_Y) < 0)
             die("error: ioctl");
 
-//        device.absmax[REL_X] = 100;
-//        device.absmin[REL_X] = -100;
-//        device.absmax[REL_Y] = 100;
-//        device.absmin[REL_Y] = -100;
     }
 }
 
-void IOManager::handleMsg(struct input_event &event) {
-    write(fd, &event, sizeof(event));
+void IOManager::handleMsg(struct my_event* event) {
+
+    switch (event->type) {
+        case EV_REL:
+
+            event_x.value = event[0].value;
+            write(fd, &event_x, sizeof(event_x));
+
+            event_y.value = event[1].value;
+            write(fd, &event_y, event_size);
+
+            write(fd, &event_sync, event_size);
+
+            break;
+        default:
+
+            struct input_event data;
+            memset(&data, 0, sizeof(data));
+
+            data.code = event->code;
+            data.type = event->type;
+            data.value = event->value;
+            write(fd, &data, sizeof(data));
+
+            write(fd, &event_sync, sizeof(event_sync));
+    }
+
+
 }

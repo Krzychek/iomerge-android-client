@@ -9,34 +9,24 @@
 #include <linux/uinput.h>
 #include "IOManager.h"
 
-/*---------- predeclared shared functions ----------*/
-FILE* get_fifo();
-
-void send_event(struct input_event &event);
 
 /*---------- constants ----------*/
-const char NAME[] = "/data/local/tmp/iomerge_fifo";
+const char NAME[] = "/data/data/org.kbieron.iomerge/cache/iomerge_fifo";
 
 int main() {
-    struct input_event event;
+    FILE* fp;
+
+    struct my_event buff[4];
+    memset(&buff, 0, sizeof(buff));
+
     IOManager ioManager(false, true);
 
-    FILE *fp;
-    char readbuf[80];
+    while (1) {
+        fp = fopen(NAME, "rb");
+        fgets((char*) &buff, sizeof(buff), fp);
 
-    /* Create the FIFO if it does not exist */
-    umask(0);
-    mknod(NAME, S_IFIFO|0666, 0);
-    printf("created fifo");
-    fflush(stdout);
+        ioManager.handleMsg(buff);
 
-    while(1)
-    {
-        fp = fopen(NAME, "r");
-        fgets(readbuf, 80, fp);
-        printf("Received string: %s\n", readbuf);
-        fflush(stdout);
         fclose(fp);
     }
 }
-
