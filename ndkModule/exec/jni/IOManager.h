@@ -1,8 +1,4 @@
-#ifndef IOMERGE_IOMANAGER_H
-#define IOMERGE_IOMANAGER_H
-
 #include <linux/uinput.h>
-
 
 class IOManager {
 public:
@@ -17,6 +13,3 @@ private:
     void initializeKbd();
     void initializeMouse();
 };
-
-
-#endif //IOMERGE_IOMANAGER_H
