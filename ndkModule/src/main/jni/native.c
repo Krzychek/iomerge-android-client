@@ -21,7 +21,6 @@ const char NAME[] = "/data/data/org.kbieron.iomerge/cache/iomerge_fifo";
 /*-------------- JNI functions --------------*/
 JNIEXPORT void JNICALL
 Java_org_kbieron_iomerge_io_InputDevice_mouseMove(JNIEnv* env, jobject instance, jshort x, jshort y) {
-    mknod(NAME, S_IFIFO | 0666, 0);
 
     struct my_event event[2];
     memset(&event, 0, sizeof(struct my_event) * 2);
@@ -72,6 +71,8 @@ Java_org_kbieron_iomerge_io_InputDevice_stop(JNIEnv* env, jobject instance) {
 
 /*------------ implement functions ------------*/
 void send_event(struct my_event* event, int count) {
+
+
     FILE * fp;
 
     if ((fp = fopen(NAME, "wb")) == NULL) {
@@ -79,4 +80,9 @@ void send_event(struct my_event* event, int count) {
     }
     fwrite(event, sizeof(struct my_event), count, fp);
     fclose(fp);
+}
+
+JNIEXPORT void JNICALL
+Java_org_kbieron_iomerge_io_InputDevice_start(JNIEnv* env, jobject instance) {
+    mknod(NAME, S_IFIFO | 0666, 0);
 }

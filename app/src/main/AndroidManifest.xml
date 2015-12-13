@@ -26,7 +26,7 @@
         </activity>
 
         <service
-            android:name="org.kbieron.iomerge.services.RMIConnector_"
+            android:name="org.kbieron.iomerge.services.EventServerClient_"
             android:enabled="true"
             android:exported="false"
             />

@@ -14,7 +14,7 @@ task compileNdkExec(type: Exec) {
 
     doLast {
         delete file("src/main/assets/iomerge")
-        file("exec/libs/armeabi/iomerge") renameTo file("src/main/assets/iomerge")
+        file("exec/libs/armeabi/iomerge") renameTo file("src/main/assets/iomerge_daemon")
 //        file("exec/libs/armeabi/iomerge") renameTo file("src/arm/assets/iomerge")
 //        file("exec/libs/arm64-v8a/iomerge") renameTo file("src/arm8/assets/iomerge")
 //        file("exec/libs/armeabi-v7a/iomerge") renameTo file("src/arm7/assets/iomerge")

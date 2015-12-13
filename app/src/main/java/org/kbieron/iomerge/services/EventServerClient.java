@@ -18,7 +18,7 @@ import java.net.Socket;
 
 
 @EService
-public class RMIConnector extends Service {
+public class EventServerClient extends Service {
 
     @Bean
     protected InputDevice inputDevice;
@@ -40,41 +40,51 @@ public class RMIConnector extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        connect("192.168.1.135", 7698);
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Background
     public void connect(String host, int port) {
         if (client != null && client.isConnected()) {
-            Log.i("connect", "already connected");
+            Log.w("EventServerClient", "already connected");
             return;
         }
 
-        client = new Socket();
         try {
+            inputDevice.startNativeDeamon(getApplicationContext());
+
+            client = new Socket();
+
             client.connect(new InetSocketAddress(host, port));
 
             ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
 
             byte[] msg;
             while (true) {
-                msg = (byte[]) objectInputStream.readObject();
+                try {
+                    msg = (byte[]) objectInputStream.readObject();
 
-                if (msg != null) {
-                    inputDevice.process(msg);
-                } else break;
+                    if (msg != null) {
+                        inputDevice.process(msg);
+                    } else break;
+                } catch (ClassNotFoundException e) {
+                    Log.w("EventServerClient", "peoblem while receiving msg", e);
+
+                }
             }
-            disconnect();
 
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
+            Log.i("EventServerClient", "disconnected");
             e.printStackTrace();
+        } finally {
+            disconnect();
         }
     }
 
+    @Background
     public void disconnect() {
-        if (client.isConnected()) {
-            Log.i("RMIConnector Service", "Disconnecting");
+        if (client != null && client.isConnected()) {
+            Log.i("EventServerClient", "Disconnecting");
             try {
                 client.close();
             } catch (IOException ignored) {}
@@ -86,8 +96,8 @@ public class RMIConnector extends Service {
 
     public class Binder extends android.os.Binder {
 
-        public RMIConnector getService() {
-            return RMIConnector.this;
+        public EventServerClient getService() {
+            return EventServerClient.this;
         }
 
     }
