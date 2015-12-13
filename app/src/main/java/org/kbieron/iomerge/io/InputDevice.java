@@ -1,4 +1,4 @@
-package org.kbieron.iomerge.rmi;
+package org.kbieron.iomerge.io;
 
 import android.util.Log;
 import android.view.KeyEvent;
@@ -7,42 +7,53 @@ import org.androidannotations.annotations.EBean;
 
 import java.io.IOException;
 
-import pl.kbieron.iomerge.iLipeRMI.IClient;
-import pl.kbieron.iomerge.model.ClientAction;
+import pl.kbieron.iomerge.model.RemoteActionProcessor;
 
 
 @EBean(scope = EBean.Scope.Singleton)
-public class IOManager implements IClient {
+public class InputDevice extends RemoteActionProcessor {
 
     static {
         System.loadLibrary("native");
     }
 
     @Override
-    public native void moveMouse(int x, int y);
+    public native void mouseMove(short x, short y);
 
     public native void stop();
 
     @Override
-    public void action(ClientAction clientAction) {
-        switch (clientAction) {
-            case HOME_BTN:
+    public native void mousePress();
+
+    @Override
+    public native void mouseRelease();
+
+    @Override
+    public void keyPress(char c) {
+        String[] execParams = {"su", " -C", "input text " + c};
+
+        try {
+            Runtime.getRuntime().exec(execParams);
+        } catch (IOException e) {
+            Log.e("IOManage", "Unable to run ", e);
+        }
+    }
+
+    @Override
+    public void keyRelease(char c) {
+        // TODO
+    }
+
+    public void action(int x) {
+        switch (x) {
+            case 0:
                 emitKeyEvent(KeyEvent.KEYCODE_HOME);
                 break;
-            case BACK_BTN:
+            case 1:
                 emitKeyEvent(KeyEvent.KEYCODE_BACK);
                 break;
-            case MENU_BTN:
+            case 2:
                 emitKeyEvent(KeyEvent.KEYCODE_BACK);
-                break;
-            case MOUSE_PRESSED:
-                // TODO
-                break;
-            case MOUSE_RELEASED:
-                // TODO
-                break;
-            case MOUSE_CLICK:
-                // TODO
                 break;
         }
     }
@@ -56,4 +67,5 @@ public class IOManager implements IClient {
             Log.e("IOManage", "Unable to run ", e);
         }
     }
+
 }

@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="org.kbieron.iomerge.activities.IOMerge_"
+            android:name="org.kbieron.iomerge.activities.MainActivity_"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -27,7 +27,7 @@
 
         <service
             android:name="org.kbieron.iomerge.services.RMIConnector_"
-            android:enabled="false"
+            android:enabled="true"
             android:exported="false"
             />
 

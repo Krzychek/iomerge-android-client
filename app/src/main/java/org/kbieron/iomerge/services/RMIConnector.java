@@ -5,33 +5,28 @@ import android.app.Service;
 import android.content.Intent;
 import android.util.Log;
 
-import net.sf.lipermi.exception.LipeRMIException;
-import net.sf.lipermi.handler.CallHandler;
-import net.sf.lipermi.net.Client;
-
-
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.SystemService;
-import org.kbieron.iomerge.rmi.IOManager;
+import org.kbieron.iomerge.io.InputDevice;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
-import pl.kbieron.iomerge.iLipeRMI.IClient;
-import pl.kbieron.iomerge.iLipeRMI.IServer;
 
 @EService
 public class RMIConnector extends Service {
 
-    private IServer server;
-
-    private Client client;
-
     @Bean
-    protected IOManager ioManager;
+    protected InputDevice inputDevice;
 
     @SystemService
     NotificationManager notificationManager;
+
+    private Socket client;
 
     @Override
     public Binder onBind(Intent intent) {
@@ -43,39 +38,54 @@ public class RMIConnector extends Service {
         disconnect();
     }
 
-    public void connect(String address, int port) {
-        CallHandler callHandler = new CallHandler();
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        connect("192.168.1.135", 7698);
+        return super.onStartCommand(intent, flags, startId);
+    }
 
-        try {
-            callHandler.exportObject(IClient.class, ioManager);
-            Log.i("RMIConnector Service", "IClient exported");
-
-            client = new Client(address, port, callHandler);
-            Log.i("RMIConnector Service", "RMI connected to server");
-
-            server = (IServer) client.getGlobal(IServer.class);
-            server.setClient(ioManager, 400, 400);
-            Log.i("RMIConnector Service", "ioManager connected to server");
-
-        } catch (IOException | LipeRMIException e) {
-            Log.e("RMIConnector Service", "Filed to connect", e);
-            disconnect();
+    @Background
+    public void connect(String host, int port) {
+        if (client != null && client.isConnected()) {
+            Log.i("connect", "already connected");
+            return;
         }
-        notificationManager.notify();
+
+        client = new Socket();
+        try {
+            client.connect(new InetSocketAddress(host, port));
+
+            ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
+
+            byte[] msg;
+            while (true) {
+                msg = (byte[]) objectInputStream.readObject();
+
+                if (msg != null) {
+                    inputDevice.process(msg);
+                } else break;
+            }
+            disconnect();
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void disconnect() {
-        Log.i("RMIConnector Service", "Disconnecting");
-        try {
-            client.close();
-        } catch (IOException ignored) {}
-        client = null;
-        server = null;
-        ioManager.stop();
+        if (client.isConnected()) {
+            Log.i("RMIConnector Service", "Disconnecting");
+            try {
+                client.close();
+            } catch (IOException ignored) {}
+            client = null;
+        }
+        inputDevice.stop();
     }
 
 
     public class Binder extends android.os.Binder {
+
         public RMIConnector getService() {
             return RMIConnector.this;
         }

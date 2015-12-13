@@ -10,18 +10,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.kbieron.iomerge.android.R;
+import org.kbieron.iomerge.io.InputDevice;
 import org.kbieron.iomerge.services.RMIConnector;
+import org.kbieron.iomerge.services.RMIConnector_;
 
 
 @EActivity(R.layout.main_activity)
-public class IOMerge extends Activity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends Activity implements NavigationView.OnNavigationItemSelectedListener {
 
     @ViewById(R.id.fab)
     protected FloatingActionButton fab;
@@ -34,6 +38,9 @@ public class IOMerge extends Activity implements NavigationView.OnNavigationItem
 
     @ViewById(R.id.nav_view)
     protected NavigationView navigationView;
+
+    @Bean
+    protected InputDevice inputDevice;
 
 
     @AfterViews
@@ -81,15 +88,23 @@ public class IOMerge extends Activity implements NavigationView.OnNavigationItem
     }
 
     @Override
+    public boolean onGenericMotionEvent(MotionEvent event) {
+        return super.onGenericMotionEvent(event);
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         switch (id) {
             case R.id.nav_close_drawer:
-                drawer.closeDrawer(GravityCompat.START);
+                drawer.closeDrawer(GravityCompat.END);
                 break;
             case R.id.nav_share:
+
+                RMIConnector_.intent(getApplication()).start();
+
                 break;
             case R.id.nav_send:
                 break;
