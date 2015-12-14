@@ -51,7 +51,7 @@ public class EventServerClient extends Service {
         }
 
         try {
-            inputDevice.startNativeDeamon(getApplicationContext());
+            inputDevice.startNativeDaemon(getApplicationContext());
 
             client = new Socket();
 
@@ -68,7 +68,7 @@ public class EventServerClient extends Service {
                         inputDevice.process(msg);
                     } else break;
                 } catch (ClassNotFoundException e) {
-                    Log.w("EventServerClient", "peoblem while receiving msg", e);
+                    Log.w("EventServerClient", "problem while receiving msg", e);
 
                 }
             }
@@ -90,7 +90,7 @@ public class EventServerClient extends Service {
             } catch (IOException ignored) {}
             client = null;
         }
-        inputDevice.stop();
+        inputDevice.stopGently();
     }
 
 

@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import org.androidannotations.annotations.EBean;
+import org.kbieron.iomerge.services.RemoteActionProcessor;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,45 +13,42 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import pl.kbieron.iomerge.model.RemoteActionProcessor;
-
 
 @EBean(scope = EBean.Scope.Singleton)
 public class InputDevice extends RemoteActionProcessor {
+
+    public static final String DAEMON_NAME = "iomerge_daemon";
 
     static {
         System.loadLibrary("native");
     }
 
+    private native void initializePipe();
+
+    public void stopGently() {
+
+        try {
+            //noinspection SpellCheckingInspection
+            Runtime.getRuntime().exec(new String[]{"su", "-C", "killall " + DAEMON_NAME}).waitFor();
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public native void mouseMove(short x, short y);
 
-    public native void stop();
-
     @Override
     public native void mousePress();
-
-    private native void start();
 
     @Override
     public native void mouseRelease();
 
     @Override
-    public void keyPress(char c) {
-        String[] execParams = {"su", " -C", "input text " + c};
-
-        try {
-            Runtime.getRuntime().exec(execParams);
-        } catch (IOException e) {
-            Log.e("IOManage", "Unable to run ", e);
-        }
-        // TODO
-    }
+    public native void keyPress(int c);
 
     @Override
-    public void keyRelease(char c) {
-        // TODO
-    }
+    public native void keyRelease(int c);
 
     @Override
     public void homeBtnClick() {
@@ -68,6 +66,7 @@ public class InputDevice extends RemoteActionProcessor {
     }
 
     private void emitKeyEvent(int event) {
+        //noinspection SpellCheckingInspection
         String[] execParams = {"su", " -C", "input keyevent " + event};
 
         try {
@@ -77,18 +76,13 @@ public class InputDevice extends RemoteActionProcessor {
         }
     }
 
-    public void startNativeDeamon(Context context) throws IOException {
-        String daemonName = "iomerge_daemon";
-        String outPath = context.getCacheDir().getAbsoluteFile() + File.separator + daemonName;
+    public void startNativeDaemon(Context context) throws IOException {
+        String outPath = context.getCacheDir().getAbsoluteFile() + File.separator + DAEMON_NAME;
 
-        try {
-            Runtime.getRuntime().exec(new String[]{"su", "-C", "killall " + daemonName}).waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        stopGently();
 
         try (FileOutputStream output = new FileOutputStream(new File(outPath));
-             InputStream input = context.getAssets().open(daemonName)) {
+             InputStream input = context.getAssets().open(DAEMON_NAME)) {
 
             copy(input, output);
         }
@@ -99,7 +93,7 @@ public class InputDevice extends RemoteActionProcessor {
             e.printStackTrace();
         }
 
-        start();
+        initializePipe();
 
         Runtime.getRuntime().exec(new String[]{"su", "-C", outPath});
     }

@@ -19,7 +19,7 @@ int main() {
     struct my_event buff[4];
     memset(&buff, 0, sizeof(buff));
 
-    IOManager ioManager(false, true);
+    IOManager ioManager(true, true);
 
     while (1) {
         fp = fopen(NAME, "rb");
