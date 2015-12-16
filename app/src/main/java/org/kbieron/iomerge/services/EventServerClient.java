@@ -9,6 +9,8 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.kbieron.iomerge.Preferences_;
 import org.kbieron.iomerge.io.InputDevice;
 
 import java.io.IOException;
@@ -22,6 +24,9 @@ public class EventServerClient extends Service {
 
     @Bean
     protected InputDevice inputDevice;
+
+    @Pref
+    Preferences_ preferences;
 
     @SystemService
     NotificationManager notificationManager;
@@ -55,7 +60,7 @@ public class EventServerClient extends Service {
 
             client = new Socket();
 
-            client.connect(new InetSocketAddress(host, port));
+            client.connect(new InetSocketAddress(preferences.serverAddress().get(), preferences.serverPort().get()));
 
             ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
 

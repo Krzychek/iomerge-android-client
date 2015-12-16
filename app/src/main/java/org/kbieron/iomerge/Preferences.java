@@ -3,11 +3,11 @@ package org.kbieron.iomerge;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
 
 
-@SharedPref
+@SharedPref(SharedPref.Scope.UNIQUE)
 public interface Preferences {
 
-    String serverAdress();
+    String serverAddress();
 
-    String serverPort();
+    int serverPort();
 
 }
