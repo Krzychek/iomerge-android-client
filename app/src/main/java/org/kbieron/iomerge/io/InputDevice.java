@@ -52,12 +52,12 @@ public class InputDevice extends RemoteActionProcessor {
 
     @Override
     public void homeBtnClick() {
-        emitKeyEvent(KeyEvent.KEYCODE_BACK);
+        emitKeyEvent(KeyEvent.KEYCODE_HOME);
     }
 
     @Override
     public void backBtnClick() {
-        emitKeyEvent(KeyEvent.KEYCODE_HOME);
+        emitKeyEvent(KeyEvent.KEYCODE_BACK);
     }
 
     @Override
