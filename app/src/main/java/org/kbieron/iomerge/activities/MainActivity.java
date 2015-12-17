@@ -81,25 +81,6 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.iomerge, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        //noinspection SimplifiableIfStatement
-        if (item.getItemId() == R.id.action_settings) return true;
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
@@ -111,8 +92,9 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
                 break;
             case R.id.nav_settings:
                 SettingsActivity_.intent(this).start();
+                break;
             default:
-                Log.w("MainActivitt", "Not supported navigation item");
+                Log.w("MainActivity", "Not supported navigation item");
         }
 
         return true;

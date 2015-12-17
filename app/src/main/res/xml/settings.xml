@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceCategory android:title="Ustawienia!" >
+    <PreferenceCategory android:title="@string/settings" >
         <EditTextPreference
-            android:title="Adres"
-            android:summary="Adres serwera"
+            android:title="@string/serverAddress"
             android:key="serverAddress"/>
         <EditTextPreference
-            android:title="Port"
-            android:summary=""
+            android:title="@string/serverPort"
             android:numeric="integer"
             android:key="serverPort"/>
     </PreferenceCategory>
