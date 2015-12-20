@@ -3,20 +3,30 @@ package org.kbieron.iomerge.services;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
 
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.SystemService;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.kbieron.iomerge.Preferences_;
 import org.kbieron.iomerge.io.InputDevice;
+import org.kbieron.iomerge.ui.EdgeTriggerView;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import pl.kbieron.iomerge.model.RemoteMsgTypes;
 
 
 @EService
@@ -26,12 +36,19 @@ public class EventServerClient extends Service {
     protected InputDevice inputDevice;
 
     @Pref
-    Preferences_ preferences;
+    protected Preferences_ preferences;
 
     @SystemService
-    NotificationManager notificationManager;
+    protected NotificationManager notificationManager;
 
     private Socket client;
+
+    private ObjectOutputStream serverOutputStream;
+
+    private EdgeTriggerView edgeTriggerView;
+
+    @SystemService
+    protected WindowManager windowManager;
 
     @Override
     public Binder onBind(Intent intent) {
@@ -41,11 +58,6 @@ public class EventServerClient extends Service {
     @Override
     public void onDestroy() {
         disconnect();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
     }
 
     @Background
@@ -59,11 +71,12 @@ public class EventServerClient extends Service {
             inputDevice.startNativeDaemon(getApplicationContext());
 
             client = new Socket();
-
             client.connect(new InetSocketAddress(preferences.serverAddress().get(), preferences.serverPort().get()));
 
-            ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
+            serverOutputStream = new ObjectOutputStream(client.getOutputStream());
+            createEdgeTrigger();
 
+            ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
             byte[] msg;
             while (true) {
                 try {
@@ -78,16 +91,36 @@ public class EventServerClient extends Service {
                 }
             }
 
-        } catch (IOException e) {
-            Log.i("EventServerClient", "disconnected");
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            Log.i("EventServerClient", "disconnected", e);
         } finally {
             disconnect();
         }
     }
 
+    @UiThread
+    public void createEdgeTrigger() {
+        edgeTriggerView = new EdgeTriggerView(this, new Runnable() {
+            @Override
+            public void run() {
+                sendExit();
+            }
+        });
+        windowManager.addView(edgeTriggerView, EdgeTriggerView.getDefaultLayoutParams());
+    }
+
+    private void sendExit() {
+        try {
+            serverOutputStream.writeObject(new byte[]{RemoteMsgTypes.REMOTE_EXIT});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Background
     public void disconnect() {
+        if (edgeTriggerView != null) windowManager.removeView(edgeTriggerView);
+
         if (client != null && client.isConnected()) {
             Log.i("EventServerClient", "Disconnecting");
             try {

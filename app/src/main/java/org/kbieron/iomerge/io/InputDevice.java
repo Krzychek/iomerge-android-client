@@ -76,24 +76,19 @@ public class InputDevice extends RemoteActionProcessor {
         }
     }
 
-    public void startNativeDaemon(Context context) throws IOException {
-        String outPath = context.getCacheDir().getAbsoluteFile() + File.separator + DAEMON_NAME;
-
+    public void startNativeDaemon(Context context) throws IOException, InterruptedException {
         stopGently();
 
-        try (FileOutputStream output = new FileOutputStream(new File(outPath));
-             InputStream input = context.getAssets().open(DAEMON_NAME)) {
 
-            copy(input, output);
-
-            Runtime.getRuntime().exec(new String[]{"su", "-C", "chmod 777 " + outPath}).waitFor();
-
-            initializePipe();
-
-            Runtime.getRuntime().exec(new String[]{"su", "-C", outPath});
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        String outPath = context.getCacheDir().getAbsoluteFile() + File.separator + DAEMON_NAME;
+        try (FileOutputStream output = new FileOutputStream(new File(outPath))) {
+            copy(context.getAssets().open(DAEMON_NAME), output);
         }
+
+        Runtime.getRuntime().exec(new String[]{"su", "-C", "chmod 777 " + outPath}).waitFor();
+        initializePipe();
+
+        Runtime.getRuntime().exec(new String[]{"su", "-C", outPath});
     }
 
     synchronized private void copy(InputStream inputStream, OutputStream outputStream) throws IOException {

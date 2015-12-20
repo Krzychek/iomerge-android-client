@@ -2,14 +2,14 @@ package org.kbieron.iomerge.services;
 
 import java.nio.ByteBuffer;
 
-import static pl.kbieron.iomerge.model.RemoteActionType.BACK_BTN_CLICK;
-import static pl.kbieron.iomerge.model.RemoteActionType.HOME_BTN_CLICK;
-import static pl.kbieron.iomerge.model.RemoteActionType.KEY_PRESS;
-import static pl.kbieron.iomerge.model.RemoteActionType.KEY_RELEASE;
-import static pl.kbieron.iomerge.model.RemoteActionType.MENU_BTN_CLICK;
-import static pl.kbieron.iomerge.model.RemoteActionType.MOUSE_PRESS;
-import static pl.kbieron.iomerge.model.RemoteActionType.MOUSE_RELEASE;
-import static pl.kbieron.iomerge.model.RemoteActionType.MOUSE_SYNC;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.BACK_BTN_CLICK;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.HOME_BTN_CLICK;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.KEY_PRESS;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.KEY_RELEASE;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.MENU_BTN_CLICK;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_PRESS;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_RELEASE;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_SYNC;
 
 
 public abstract class RemoteActionProcessor {
