@@ -85,21 +85,19 @@ public class InputDevice extends RemoteActionProcessor {
              InputStream input = context.getAssets().open(DAEMON_NAME)) {
 
             copy(input, output);
-        }
 
-        try {
             Runtime.getRuntime().exec(new String[]{"su", "-C", "chmod 777 " + outPath}).waitFor();
+
+            initializePipe();
+
+            Runtime.getRuntime().exec(new String[]{"su", "-C", outPath});
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        initializePipe();
-
-        Runtime.getRuntime().exec(new String[]{"su", "-C", outPath});
     }
 
     synchronized private void copy(InputStream inputStream, OutputStream outputStream) throws IOException {
-        byte[] buffer = new byte[131072];
+        byte[] buffer = new byte[32768];
         int len;
 
         while ((len = inputStream.read(buffer)) != -1) {
