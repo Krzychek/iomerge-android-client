@@ -52,9 +52,3 @@ model {
     }
 
 }
-dependencies {
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
-    compile 'pl.kbieron:iomerge-model:1.0-SNAPSHOT'
-    compile 'com.tascape.qa:lipermi:1.0.1'
-}
