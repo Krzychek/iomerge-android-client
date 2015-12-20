@@ -18,7 +18,7 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
     public EdgeTriggerView(Context context, Runnable trigMe) {
         super(context);
         this.trigMe = trigMe;
-        this.setOnHoverListener(this);
+        setOnHoverListener(this);
     }
 
     public static WindowManager.LayoutParams getDefaultLayoutParams() {
@@ -48,7 +48,9 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 
     @Override
     public boolean onHover(View v, MotionEvent event) {
-        trigMe.run();
+        if (MotionEvent.ACTION_HOVER_ENTER == event.getAction()) {
+            trigMe.run();
+        }
         return false;
     }
 }
