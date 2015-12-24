@@ -3,11 +3,7 @@ package org.kbieron.iomerge.services;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.PixelFormat;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
 
 import org.androidannotations.annotations.Background;
@@ -36,7 +32,7 @@ public class EventServerClient extends Service {
     protected InputDevice inputDevice;
 
     @Pref
-    protected Preferences_ preferences;
+    protected Preferences_ prefs;
 
     @SystemService
     protected NotificationManager notificationManager;
@@ -61,7 +57,7 @@ public class EventServerClient extends Service {
     }
 
     @Background
-    public void connect(String host, int port) {
+    public void connect() {
         if (client != null && client.isConnected()) {
             Log.w("EventServerClient", "already connected");
             return;
@@ -71,30 +67,34 @@ public class EventServerClient extends Service {
             inputDevice.startNativeDaemon(getApplicationContext());
 
             client = new Socket();
-            client.connect(new InetSocketAddress(preferences.serverAddress().get(), preferences.serverPort().get()));
+            client.connect(new InetSocketAddress(prefs.serverAddress().get(), prefs.serverPort().get()));
 
             serverOutputStream = new ObjectOutputStream(client.getOutputStream());
             createEdgeTrigger();
 
-            ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
-            byte[] msg;
-            while (true) {
-                try {
-                    msg = (byte[]) objectInputStream.readObject();
-
-                    if (msg != null) {
-                        inputDevice.process(msg);
-                    } else break;
-                } catch (ClassNotFoundException e) {
-                    Log.w("EventServerClient", "problem while receiving msg", e);
-
-                }
-            }
+            startReceiving();
 
         } catch (IOException | InterruptedException e) {
             Log.i("EventServerClient", "disconnected", e);
         } finally {
             disconnect();
+        }
+    }
+
+    private void startReceiving() throws IOException {
+        ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
+        byte[] msg;
+        while (true) {
+            try {
+                msg = (byte[]) objectInputStream.readObject();
+
+                if (msg != null) {
+                    inputDevice.process(msg);
+                } else break;
+            } catch (ClassNotFoundException e) {
+                Log.w("EventServerClient", "problem while receiving msg", e);
+
+            }
         }
     }
 
