@@ -65,6 +65,9 @@ public class InputDevice extends RemoteActionProcessor {
         emitKeyEvent(KeyEvent.KEYCODE_MENU);
     }
 
+    @Override
+    public native void mouseWheel(int anInt);
+
     private void emitKeyEvent(int event) {
         //noinspection SpellCheckingInspection
         String[] execParams = {"su", " -C", "input keyevent " + event};

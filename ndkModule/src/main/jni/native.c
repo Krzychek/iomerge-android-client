@@ -172,6 +172,19 @@ Java_org_kbieron_iomerge_io_InputDevice_mouseRelease(JNIEnv* env, jobject instan
 
 }
 
+JNIEXPORT void JNICALL
+Java_org_kbieron_iomerge_io_InputDevice_mouseWheel(JNIEnv* env, jobject instance, jint value) {
+
+    struct my_event event;
+    memset(&event, 0, sizeof(struct my_event));
+
+    event.type = EV_REL;
+    event.code = REL_WHEEL;
+    event.value = value;
+
+    send_event(&event, 1);
+}
+
 /*----------------- KEYBOARD ----------------*/
 JNIEXPORT void JNICALL
 Java_org_kbieron_iomerge_io_InputDevice_keyPress(JNIEnv* env, jobject instance, jint c) {

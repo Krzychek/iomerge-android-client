@@ -10,6 +10,7 @@ import static pl.kbieron.iomerge.model.RemoteMsgTypes.MENU_BTN_CLICK;
 import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_PRESS;
 import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_RELEASE;
 import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_SYNC;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_WHEEL;
 
 
 public abstract class RemoteActionProcessor {
@@ -43,6 +44,9 @@ public abstract class RemoteActionProcessor {
             case MENU_BTN_CLICK:
                 menuBtnClick();
                 break;
+            case MOUSE_WHEEL:
+                mouseWheel(byteBuffer.getInt());
+                break;
         }
     }
 
@@ -61,4 +65,6 @@ public abstract class RemoteActionProcessor {
     public abstract void backBtnClick();
 
     public abstract void menuBtnClick();
+
+    public abstract void mouseWheel(int anInt);
 }

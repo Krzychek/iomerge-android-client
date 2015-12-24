@@ -105,36 +105,31 @@ void IOManager::initializeMouse() {
             die("error: ioctl");
         if (ioctl(fd, UI_SET_RELBIT, REL_Y) < 0)
             die("error: ioctl");
+        if (ioctl(fd, UI_SET_RELBIT, REL_WHEEL) < 0)
+            die("error: ioctl");
 
     }
 }
 
 void IOManager::handleMsg(struct my_event* event) {
 
-    switch (event->type) {
-        case EV_REL:
+    if (event->type == EV_REL && event->code == REL_X) {
+        event_x.value = event[0].value;
+        write(fd, &event_x, sizeof(event_x));
 
-            event_x.value = event[0].value;
-            write(fd, &event_x, sizeof(event_x));
+        event_y.value = event[1].value;
+        write(fd, &event_y, event_size);
 
-            event_y.value = event[1].value;
-            write(fd, &event_y, event_size);
+        write(fd, &event_sync, event_size);
+    } else {
+        struct input_event data;
+        memset(&data, 0, sizeof(data));
 
-            write(fd, &event_sync, event_size);
+        data.code = event->code;
+        data.type = event->type;
+        data.value = event->value;
+        write(fd, &data, sizeof(data));
 
-            break;
-        default:
-
-            struct input_event data;
-            memset(&data, 0, sizeof(data));
-
-            data.code = event->code;
-            data.type = event->type;
-            data.value = event->value;
-            write(fd, &data, sizeof(data));
-
-            write(fd, &event_sync, sizeof(event_sync));
+        write(fd, &event_sync, sizeof(event_sync));
     }
-
-
 }

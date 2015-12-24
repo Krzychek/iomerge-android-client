@@ -27,7 +27,7 @@ private:
     int fd;
     struct uinput_user_dev device;
 
-    // initilizers
+    // initializer
     void initializeKbd();
     void initializeMouse();
 };
