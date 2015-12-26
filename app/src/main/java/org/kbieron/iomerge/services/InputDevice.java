@@ -28,7 +28,7 @@ public class InputDevice {
     synchronized protected void startNativeDaemon() throws IOException, InterruptedException {
         stop();
 
-        String outPath = context.getCacheDir().getAbsoluteFile() + File.separator + DAEMON_NAME;
+        String outPath = context.getCacheDir().getAbsolutePath() + File.separator + DAEMON_NAME;
         try (FileOutputStream output = new FileOutputStream(new File(outPath))) {
             copy(context.getAssets().open(DAEMON_NAME), output);
         }
