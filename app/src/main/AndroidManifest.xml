@@ -31,7 +31,7 @@
         </activity>
 
         <service
-            android:name="org.kbieron.iomerge.services.EventServerClient_"
+            android:name="org.kbieron.iomerge.services.NetworkManager_"
             android:enabled="true"
             android:exported="false"
             />

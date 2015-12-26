@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,9 +18,9 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.kbieron.iomerge.android.R;
-import org.kbieron.iomerge.io.InputDevice;
-import org.kbieron.iomerge.services.EventServerClient;
-import org.kbieron.iomerge.services.EventServerClient_;
+import org.kbieron.iomerge.services.InputDevice;
+import org.kbieron.iomerge.services.NetworkManager;
+import org.kbieron.iomerge.services.NetworkManager_;
 
 
 @EActivity(R.layout.main_activity)
@@ -39,14 +38,14 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
     @Bean
     protected InputDevice inputDevice;
 
-    protected EventServerClient eventServerClient;
+    protected NetworkManager networkManager;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            if (service instanceof EventServerClient.Binder) {
-                eventServerClient = ((EventServerClient.Binder) service).getService();
+            if (service instanceof NetworkManager.Binder) {
+                networkManager = ((NetworkManager.Binder) service).getService();
             }
 
         }
@@ -58,7 +57,7 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 
     @AfterInject
     protected void bindServices() {
-        bindService(EventServerClient_.intent(getApplication()).get(), mConnection, BIND_AUTO_CREATE);
+        bindService(NetworkManager_.intent(getApplication()).get(), mConnection, BIND_AUTO_CREATE);
     }
 
     @AfterViews
@@ -84,10 +83,10 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 
         switch (item.getItemId()) {
             case R.id.nav_connect:
-                eventServerClient.connect();
+                networkManager.connect();
                 break;
             case R.id.nav_disconnect:
-                eventServerClient.disconnect();
+                networkManager.disconnect();
                 break;
             case R.id.nav_settings:
                 SettingsActivity_.intent(this).start();

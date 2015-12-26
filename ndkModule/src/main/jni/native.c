@@ -128,7 +128,7 @@ void send_event(struct my_event* event, size_t count) {
 /*-------------- JNI functions --------------*/
 /*------------------ MOUSE ------------------*/
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_io_InputDevice_mouseMove(JNIEnv* env, jobject instance, jshort x, jshort y) {
+Java_org_kbieron_iomerge_services_InputDevice_mouseMove(JNIEnv* env, jobject instance, jshort x, jshort y) {
 
     struct my_event event[2];
     memset(&event, 0, sizeof(struct my_event) * 2);
@@ -146,7 +146,7 @@ Java_org_kbieron_iomerge_io_InputDevice_mouseMove(JNIEnv* env, jobject instance,
 }
 
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_io_InputDevice_mousePress(JNIEnv* env, jobject instance) {
+Java_org_kbieron_iomerge_services_InputDevice_mousePress(JNIEnv* env, jobject instance) {
     struct my_event event;
     memset(&event, 0, sizeof(struct my_event));
 
@@ -159,7 +159,7 @@ Java_org_kbieron_iomerge_io_InputDevice_mousePress(JNIEnv* env, jobject instance
 }
 
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_io_InputDevice_mouseRelease(JNIEnv* env, jobject instance) {
+Java_org_kbieron_iomerge_services_InputDevice_mouseRelease(JNIEnv* env, jobject instance) {
     struct my_event event;
     memset(&event, 0, sizeof(struct my_event));
 
@@ -173,7 +173,7 @@ Java_org_kbieron_iomerge_io_InputDevice_mouseRelease(JNIEnv* env, jobject instan
 }
 
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_io_InputDevice_mouseWheel(JNIEnv* env, jobject instance, jint value) {
+Java_org_kbieron_iomerge_services_InputDevice_mouseWheel(JNIEnv* env, jobject instance, jint value) {
 
     struct my_event event;
     memset(&event, 0, sizeof(struct my_event));
@@ -187,7 +187,7 @@ Java_org_kbieron_iomerge_io_InputDevice_mouseWheel(JNIEnv* env, jobject instance
 
 /*----------------- KEYBOARD ----------------*/
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_io_InputDevice_keyPress(JNIEnv* env, jobject instance, jint c) {
+Java_org_kbieron_iomerge_services_InputDevice_keyPress(JNIEnv* env, jobject instance, jint c) {
     int eventCode = getEventCode(c);
     if (eventCode == -1) return;
 
@@ -203,7 +203,7 @@ Java_org_kbieron_iomerge_io_InputDevice_keyPress(JNIEnv* env, jobject instance, 
 }
 
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_io_InputDevice_keyRelease(JNIEnv* env, jobject instance, jint c) {
+Java_org_kbieron_iomerge_services_InputDevice_keyRelease(JNIEnv* env, jobject instance, jint c) {
     int eventCode = getEventCode(c);
     if (eventCode == -1) return;
 
@@ -220,11 +220,11 @@ Java_org_kbieron_iomerge_io_InputDevice_keyRelease(JNIEnv* env, jobject instance
 
 /*------------------ SYSTEM -----------------*/
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_io_InputDevice_stop(JNIEnv* env, jobject instance) {
+Java_org_kbieron_iomerge_services_MessageProcessor_stop(JNIEnv* env, jobject instance) {
     // TODO
 }
 
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_io_InputDevice_initializePipe(JNIEnv* env, jobject instance) {
+Java_org_kbieron_iomerge_services_InputDevice_initializePipe(JNIEnv* env, jobject instance) {
     mknod(NAME, S_IFIFO | 0666, 0);
 }
