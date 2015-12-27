@@ -9,9 +9,10 @@
     <string name="drawer_main_title">Client</string>
     <string name="serverAddress">Server address</string>
     <string name="serverPort">Server port</string>
-    <string name="settings">Settings</string>
 
     <!-- Notification: server connected -->
     <string name="server_connected_ticker">IOMerge: connected</string>
-    <string name="server_connected_text">connected</string>
+    <string name="server_connected_text">connected to </string>
+    <string name="add">add</string>
+    <string name="wrong_address_format">Wrong IP adress</string>
 </resources>

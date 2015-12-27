@@ -11,12 +11,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.kbieron.iomerge.Preferences_;
 import org.kbieron.iomerge.android.R;
 import org.kbieron.iomerge.services.InputDevice;
 import org.kbieron.iomerge.services.NetworkManager;
@@ -31,6 +34,12 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 
     @ViewById(R.id.drawer_layout)
     protected DrawerLayout drawer;
+
+    @Pref
+    protected Preferences_ prefs;
+
+    @ViewById(R.id.active_server_address)
+    protected TextView activeServerView;
 
     @ViewById(R.id.nav_view)
     protected NavigationView navigationView;
@@ -62,7 +71,16 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 
     @AfterViews
     protected void afterViews() {
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                if (newState != DrawerLayout.STATE_IDLE) {
+                    ((TextView) drawer.findViewById(R.id.active_server_address)) //
+                            .setText(prefs.serverAddress().get() + ":" + prefs.serverPort().get());
+                }
+                super.onDrawerStateChanged(newState);
+            }
+        };
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -87,9 +105,6 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
                 break;
             case R.id.nav_disconnect:
                 networkManager.disconnect();
-                break;
-            case R.id.nav_settings:
-                SettingsActivity_.intent(this).start();
                 break;
             default:
                 Log.w("MainActivity", "Not supported navigation item");

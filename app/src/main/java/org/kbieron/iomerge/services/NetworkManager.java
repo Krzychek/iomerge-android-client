@@ -1,6 +1,5 @@
 package org.kbieron.iomerge.services;
 
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.util.Log;
@@ -15,7 +14,7 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.kbieron.iomerge.Preferences_;
 import org.kbieron.iomerge.notifications.NotificationFactory;
-import org.kbieron.iomerge.ui.EdgeTriggerView;
+import org.kbieron.iomerge.views.EdgeTriggerView;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -65,7 +64,7 @@ public class NetworkManager extends Service {
     @Background
     public void connect() {
         if (!connectionHandler.isConnected()) {
-            startForeground(1, notificationFactory.serverConnected(this));
+            startForeground(1, notificationFactory.serverConnected(prefs.serverAddress().get(), prefs.serverPort().get()));
 
             try {
                 inputDevice.startNativeDaemon();

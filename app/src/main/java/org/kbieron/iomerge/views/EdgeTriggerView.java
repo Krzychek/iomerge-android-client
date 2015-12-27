@@ -1,4 +1,4 @@
-package org.kbieron.iomerge.ui;
+package org.kbieron.iomerge.views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

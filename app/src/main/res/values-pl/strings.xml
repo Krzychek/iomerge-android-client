@@ -7,7 +7,8 @@
     <string name="drawer_main_title">Klient</string>
     <string name="serverAddress">Adres serwera</string>
     <string name="serverPort">Port serwera</string>
-    <string name="settings">Ustawienia</string>
-    <string name="server_connected_text">połączono</string>
+    <string name="server_connected_text">połączono z </string>
     <string name="server_connected_ticker">IOMerge: połączono</string>
+    <string name="add">dodaj</string>
+    <string name="wrong_address_format">Niepoprawny format adresu IP</string>
 </resources>
