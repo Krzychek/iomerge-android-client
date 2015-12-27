@@ -1,10 +1,8 @@
 <resources>
-    <string name="app_name">IOMerge</string>
+    <string name="app_name" translatable="false">IOMerge</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="server_connected_notif_notification_title_template">Server connected: %1$s</string>
 
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
@@ -12,4 +10,8 @@
     <string name="serverAddress">Server address</string>
     <string name="serverPort">Server port</string>
     <string name="settings">Settings</string>
+
+    <!-- Notification: server connected -->
+    <string name="server_connected_ticker">IOMerge: connected</string>
+    <string name="server_connected_text">connected</string>
 </resources>

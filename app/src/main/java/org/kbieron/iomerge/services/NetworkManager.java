@@ -14,6 +14,7 @@ import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.kbieron.iomerge.Preferences_;
+import org.kbieron.iomerge.notifications.NotificationFactory;
 import org.kbieron.iomerge.ui.EdgeTriggerView;
 
 import java.io.IOException;
@@ -30,11 +31,11 @@ public class NetworkManager extends Service {
     @Bean
     protected InputDevice inputDevice;
 
+    @Bean
+    protected NotificationFactory notificationFactory;
+
     @Pref
     protected Preferences_ prefs;
-
-    @SystemService
-    protected NotificationManager notificationManager;
 
     @SystemService
     protected WindowManager windowManager;
@@ -64,6 +65,7 @@ public class NetworkManager extends Service {
     @Background
     public void connect() {
         if (!connectionHandler.isConnected()) {
+            startForeground(1, notificationFactory.serverConnected(this));
 
             try {
                 inputDevice.startNativeDaemon();
@@ -97,6 +99,7 @@ public class NetworkManager extends Service {
         windowManager.removeView(edgeTriggerView);
         connectionHandler.disconnect();
         inputDevice.stop();
+        stopForeground(true);
     }
 
 

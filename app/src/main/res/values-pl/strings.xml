@@ -1,10 +1,6 @@
 <resources>
-    <string name="app_name">IOMerge</string>
-
     <string name="navigation_drawer_open">Otwórz pułkę nawigacyjną</string>
     <string name="navigation_drawer_close">Zamknij pułkę nawigacyjną</string>
-
-    <string name="server_connected_notif_notification_title_template">Połączono z serwerem: %1$s</string>
 
     <string name="connect">Połącz</string>
     <string name="disconnect">Rozłącz</string>
@@ -12,4 +8,6 @@
     <string name="serverAddress">Adres serwera</string>
     <string name="serverPort">Port serwera</string>
     <string name="settings">Ustawienia</string>
+    <string name="server_connected_text">połączono</string>
+    <string name="server_connected_ticker">IOMerge: połączono</string>
 </resources>
