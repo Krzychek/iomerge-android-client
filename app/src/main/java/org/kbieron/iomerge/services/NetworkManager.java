@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import pl.kbieron.iomerge.model.Edge;
+
 
 @EService
-public class NetworkManager extends Service {
+public class NetworkManager extends Service implements EdgeTriggerView.OnTrigListener {
 
     @Bean
     protected ConnectionHandler connectionHandler;
@@ -39,7 +41,8 @@ public class NetworkManager extends Service {
     @SystemService
     protected WindowManager windowManager;
 
-    private EdgeTriggerView edgeTriggerView;
+    @Bean
+    protected EdgeTriggerView edgeTriggerView;
 
     @Override
     public Binder onBind(Intent intent) {
@@ -53,12 +56,7 @@ public class NetworkManager extends Service {
 
     @AfterInject
     protected void init() {
-        edgeTriggerView = new EdgeTriggerView(this, new Runnable() {
-            @Override
-            public void run() {
-                connectionHandler.sendExit();
-            }
-        });
+        edgeTriggerView.setOnTrigListener(this);
     }
 
     @Background
@@ -89,7 +87,7 @@ public class NetworkManager extends Service {
 
     @UiThread
     protected void showEdgeTrigger() {
-        windowManager.addView(edgeTriggerView, EdgeTriggerView.getDefaultLayoutParams());
+        edgeTriggerView.showOrMove(Edge.LEFT);
     }
 
     @Background
@@ -99,6 +97,11 @@ public class NetworkManager extends Service {
         connectionHandler.disconnect();
         inputDevice.stop();
         stopForeground(true);
+    }
+
+    @Override
+    public void onTrig() {
+        connectionHandler.sendExit();
     }
 
 

@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
+import org.kbieron.iomerge.views.EdgeTriggerView;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,10 +16,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+import pl.kbieron.iomerge.model.Edge;
 import pl.kbieron.iomerge.model.RemoteMsgTypes;
 
 import static pl.kbieron.iomerge.model.RemoteMsgTypes.BACK_BTN_CLICK;
 import static pl.kbieron.iomerge.model.RemoteMsgTypes.CLIPBOARD_SYNC;
+import static pl.kbieron.iomerge.model.RemoteMsgTypes.EDGE_SYNC;
 import static pl.kbieron.iomerge.model.RemoteMsgTypes.HOME_BTN_CLICK;
 import static pl.kbieron.iomerge.model.RemoteMsgTypes.KEY_PRESS;
 import static pl.kbieron.iomerge.model.RemoteMsgTypes.KEY_RELEASE;
@@ -34,6 +37,9 @@ class ConnectionHandler implements ClipboardManager.OnPrimaryClipChangedListener
 
     @Bean
     protected InputDevice inputDevice;
+
+    @Bean
+    protected EdgeTriggerView edgeTrigger;
 
     @SystemService
     protected ClipboardManager clipboardManager;
@@ -98,6 +104,9 @@ class ConnectionHandler implements ClipboardManager.OnPrimaryClipChangedListener
                 break;
             case CLIPBOARD_SYNC:
                 setClipboardText(new String(msgBuffer.array(), msgBuffer.arrayOffset() + msgBuffer.position(), msgBuffer.remaining()));
+                break;
+            case EDGE_SYNC:
+                edgeTrigger.showOrMove(Edge.values()[msgBuffer.get()]);
                 break;
         }
     }

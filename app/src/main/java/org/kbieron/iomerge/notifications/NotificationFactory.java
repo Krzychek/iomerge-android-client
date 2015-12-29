@@ -12,7 +12,7 @@ import org.kbieron.iomerge.android.R;
 import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
 
 
-@EBean
+@EBean(scope = EBean.Scope.Singleton)
 public class NotificationFactory {
 
     @StringRes(R.string.server_connected_text)
