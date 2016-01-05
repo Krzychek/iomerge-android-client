@@ -17,23 +17,14 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 import pl.kbieron.iomerge.model.Edge;
-import pl.kbieron.iomerge.model.RemoteMsgTypes;
-
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.BACK_BTN_CLICK;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.CLIPBOARD_SYNC;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.EDGE_SYNC;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.HOME_BTN_CLICK;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.KEY_PRESS;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.KEY_RELEASE;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.MENU_BTN_CLICK;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_PRESS;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_RELEASE;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_SYNC;
-import static pl.kbieron.iomerge.model.RemoteMsgTypes.MOUSE_WHEEL;
+import pl.kbieron.iomerge.model.MessageProcessorAdapter;
+import pl.kbieron.iomerge.model.message.Message;
+import pl.kbieron.iomerge.model.message.misc.ClipboardSync;
+import pl.kbieron.iomerge.model.message.misc.RemoteExit;
 
 
 @EBean(scope = EBean.Scope.Singleton)
-class ConnectionHandler implements ClipboardManager.OnPrimaryClipChangedListener {
+class ConnectionHandler extends MessageProcessorAdapter implements ClipboardManager.OnPrimaryClipChangedListener {
 
     @Bean
     protected InputDevice inputDevice;
@@ -55,64 +46,67 @@ class ConnectionHandler implements ClipboardManager.OnPrimaryClipChangedListener
         clipboardManager.addPrimaryClipChangedListener(this);
 
         ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
-        byte[] msg;
         while (true) {
             try {
-                msg = (byte[]) objectInputStream.readObject();
-
-                if (msg != null) {
-                    process(msg);
-                } else break;
+                ((Message) objectInputStream.readObject()).process(this);
             } catch (ClassNotFoundException | ClassCastException e) {
                 Log.w("NetworkManager", "problem while receiving msg", e);
-
             }
         }
     }
 
-    public void process(byte[] msg) {
-        ByteBuffer msgBuffer = ByteBuffer.wrap(msg);
-        byte actionType = msgBuffer.get();
-
-        switch (actionType) {
-            case MOUSE_SYNC:
-                inputDevice.mouseMove(msgBuffer.getShort(), msgBuffer.getShort());
-                break;
-            case MOUSE_PRESS:
-                inputDevice.mousePress();
-                break;
-            case MOUSE_RELEASE:
-                inputDevice.mouseRelease();
-                break;
-            case KEY_PRESS:
-                inputDevice.keyPress(msgBuffer.getInt());
-                break;
-            case KEY_RELEASE:
-                inputDevice.keyRelease(msgBuffer.getInt());
-                break;
-            case HOME_BTN_CLICK:
-                inputDevice.emitKeyEvent(KeyEvent.KEYCODE_HOME);
-                break;
-            case BACK_BTN_CLICK:
-                inputDevice.emitKeyEvent(KeyEvent.KEYCODE_BACK);
-                break;
-            case MENU_BTN_CLICK:
-                inputDevice.emitKeyEvent(KeyEvent.KEYCODE_MENU);
-                break;
-            case MOUSE_WHEEL:
-                inputDevice.mouseWheel(msgBuffer.getInt());
-                break;
-            case CLIPBOARD_SYNC:
-                setClipboardText(new String(msgBuffer.array(), msgBuffer.arrayOffset() + msgBuffer.position(), msgBuffer.remaining()));
-                break;
-            case EDGE_SYNC:
-                edgeTrigger.showOrMove(Edge.values()[msgBuffer.get()]);
-                break;
-        }
+    @Override
+    public void mousePress() {
+        inputDevice.mousePress();
     }
 
+    @Override
+    public void mouseRelease() {
+        inputDevice.mouseRelease();
+    }
 
-    private void setClipboardText(String text) {
+    @Override
+    public void mouseSync(int x, int y) {
+        inputDevice.mouseMove(x, y);
+    }
+
+    @Override
+    public void mouseWheel(int move) {
+        inputDevice.mouseWheel(move);
+    }
+
+    @Override
+    public void backBtnClick() {
+        inputDevice.emitKeyEvent(KeyEvent.KEYCODE_BACK);
+    }
+
+    @Override
+    public void homeBtnClick() {
+        inputDevice.emitKeyEvent(KeyEvent.KEYCODE_HOME);
+    }
+
+    @Override
+    public void menuBtnClick() {
+        inputDevice.emitKeyEvent(KeyEvent.KEYCODE_MENU);
+    }
+
+    @Override
+    public void edgeSync(Edge edge) {
+        edgeTrigger.showOrMove(edge);
+    }
+
+    @Override
+    public void keyPress(int keyCode) {
+        inputDevice.keyPress(keyCode);
+    }
+
+    @Override
+    public void keyRelease(int keyCode) {
+        inputDevice.keyRelease(keyCode);
+    }
+
+    @Override
+    public void clipboardSync(String text) {
         clipboardManager.removePrimaryClipChangedListener(this);
         clipboardManager.setPrimaryClip(ClipData.newPlainText("IOMerge", text));
         clipboardManager.addPrimaryClipChangedListener(this);
@@ -120,21 +114,17 @@ class ConnectionHandler implements ClipboardManager.OnPrimaryClipChangedListener
 
     @Override
     public void onPrimaryClipChanged() {
-        byte[] clipboardBytes = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString().getBytes();
-        byte[] msg = new byte[clipboardBytes.length + 1];
-        msg[0] = CLIPBOARD_SYNC;
-        System.arraycopy(clipboardBytes, 0, msg, 1, clipboardBytes.length);
+        String clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString();
         try {
-            serverOutputStream.writeObject(msg);
+            serverOutputStream.writeObject(new ClipboardSync(clipboardText));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
     public void sendExit() {
         try {
-            serverOutputStream.writeObject(new byte[]{RemoteMsgTypes.REMOTE_EXIT});
+            serverOutputStream.writeObject(new RemoteExit());
         } catch (IOException e) {
             e.printStackTrace();
         }

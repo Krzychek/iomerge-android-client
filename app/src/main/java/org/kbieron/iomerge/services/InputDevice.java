@@ -51,7 +51,7 @@ public class InputDevice {
 
     private native void initializePipe();
 
-    native void mouseMove(short x, short y);
+    native void mouseMove(int x, int y);
 
     native void mousePress();
 
