@@ -23,7 +23,7 @@ import pl.kbieron.iomerge.model.message.misc.RemoteExit;
 
 
 @EBean(scope = EBean.Scope.Singleton)
-class ConnectionHandler extends MessageProcessorAdapter implements ClipboardManager.OnPrimaryClipChangedListener {
+class ConnectionHandler extends MessageProcessorAdapter implements ClipboardManager.OnPrimaryClipChangedListener, EdgeTriggerView.OnTrigListener {
 
     @Bean
     protected InputDevice inputDevice;
@@ -139,5 +139,10 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 
     public boolean isConnected() {
         return client != null && client.isConnected();
+    }
+
+    @Override
+    public void onTrig() {
+        sendExit();
     }
 }
