@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.WindowManager;
 
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
