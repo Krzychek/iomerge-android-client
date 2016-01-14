@@ -3,7 +3,7 @@ package org.kbieron.iomerge;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
 
 
-@SharedPref(SharedPref.Scope.UNIQUE)
+@SharedPref()
 public interface Preferences {
 
     String serverAddress();
