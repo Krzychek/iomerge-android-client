@@ -65,7 +65,7 @@ int getEventCode(int keyCode) {
             //        case 54: return KEY_RIGHTSHIFT;
             //        case 55: return KEY_KPASTERISK;
         case 18: return KEY_LEFTALT;
-        case 32: return 15; // KEY_SPACE;
+        case 32: return KEY_SPACE;
             //        case 58: return KEY_CAPSLOCK;
             //        case 59: return KEY_F1;
             //        case 60: return KEY_F2;
@@ -92,7 +92,7 @@ int getEventCode(int keyCode) {
             //        case 81: return KEY_KP3;
             //        case 82: return KEY_KP0;
         case 37: return KEY_LEFT;
-        case 38: return 104; //KEY_UP;
+        case 38: return KEY_UP;
         case 39: return KEY_RIGHT;
         case 40: return KEY_DOWN;
             //        case 83: return KEY_KPDOT;
