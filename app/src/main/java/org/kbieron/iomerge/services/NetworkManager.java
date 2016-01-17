@@ -87,7 +87,9 @@ public class NetworkManager extends Service {
     @Background
     public void disconnect() {
         Log.i("NetworkManager", "Disconnecting");
-        windowManager.removeView(edgeTriggerView);
+        if (edgeTriggerView.isAttachedToWindow()){
+            windowManager.removeView(edgeTriggerView);
+        }
         connectionHandler.disconnect();
         inputDevice.stop();
         stopForeground(true);

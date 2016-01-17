@@ -131,7 +131,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 
     public void disconnect() {
         try {
-            client.close();
+            if (client != null) client.close();
         } catch (IOException ignored) {}
 
         clipboardManager.removePrimaryClipChangedListener(this);
