@@ -112,6 +112,11 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
     }
 
     @Override
+    public void keyClick(int i) {
+        inputDevice.keyClick(i);
+    }
+
+    @Override
     public void onPrimaryClipChanged() {
         String clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString();
         try {

@@ -82,4 +82,6 @@ public class InputDevice {
             outputStream.write(buffer, 0, len);
         }
     }
+
+    native void keyClick(int i);
 }

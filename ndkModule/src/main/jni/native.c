@@ -158,7 +158,6 @@ Java_org_kbieron_iomerge_services_InputDevice_mousePress(JNIEnv* env, jobject in
     struct my_event event;
     memset(&event, 0, sizeof(struct my_event));
 
-    // x
     event.type = EV_KEY;
     event.code = BTN_LEFT;
     event.value = 1;
@@ -171,7 +170,6 @@ Java_org_kbieron_iomerge_services_InputDevice_mouseRelease(JNIEnv* env, jobject 
     struct my_event event;
     memset(&event, 0, sizeof(struct my_event));
 
-    // x
     event.type = EV_KEY;
     event.code = BTN_LEFT;
     event.value = 0;
@@ -218,11 +216,28 @@ Java_org_kbieron_iomerge_services_InputDevice_keyRelease(JNIEnv* env, jobject in
     struct my_event event;
     memset(&event, 0, sizeof(struct my_event));
 
-    // x
     event.type = EV_KEY;
     event.code = eventCode;
     event.value = 0;
 
+    send_event(&event, 1);
+}
+
+
+JNIEXPORT void JNICALL
+Java_org_kbieron_iomerge_services_InputDevice_keyClick(JNIEnv* env, jobject instance, jint c) {
+    int eventCode = getEventCode(c);
+    if (eventCode == -1) return;
+
+    struct my_event event;
+    memset(&event, 0, sizeof(struct my_event));
+
+    event.type = EV_KEY;
+    event.code = eventCode;
+
+    event.value = 1;
+    send_event(&event, 1);
+    event.value = 0;
     send_event(&event, 1);
 }
 
