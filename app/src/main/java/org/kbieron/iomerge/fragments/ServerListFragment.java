@@ -102,7 +102,8 @@ public class ServerListFragment extends Fragment implements AdapterView.OnItemCl
         ServerBean item = listAdapter.getItem(position);
         prefs.edit() //
                 .serverAddress().put(item.getAddress()) //
-                .serverPort().put(item.getPort());
+                .serverPort().put(item.getPort()) //
+                .apply();
         refresh();
     }
 }

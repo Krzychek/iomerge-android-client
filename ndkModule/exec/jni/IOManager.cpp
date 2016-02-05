@@ -70,7 +70,7 @@ int const ENABLED_KEYS[] = { //
         KEY_KP7, KEY_KP8, KEY_KP9, KEY_KPMINUS, //
         KEY_KP4, KEY_KP5, KEY_KP6, KEY_KPPLUS, //
         KEY_KP1, KEY_KP2, KEY_KP3, KEY_KP0, //
-        KEY_LEFTCTRL, KEY_LEFTALT,KEY_SPACE, KEY_RIGHTALT, KEY_RIGHTCTRL, // 1st row
+        KEY_LEFTCTRL, KEY_LEFTALT, KEY_SPACE, KEY_RIGHTALT, KEY_RIGHTCTRL, // 1st row
         KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, // arrows
 };
 
@@ -113,7 +113,7 @@ void IOManager::handleMsg(struct my_event* event) {
 
     if (event->type == EV_REL && event->code == REL_X) {
         event_x.value = event[0].value;
-        write(fd, &event_x, sizeof(event_x));
+        write(fd, &event_x, event_size);
 
         event_y.value = event[1].value;
         write(fd, &event_y, event_size);
@@ -121,13 +121,13 @@ void IOManager::handleMsg(struct my_event* event) {
         write(fd, &event_sync, event_size);
     } else {
         struct input_event data;
-        memset(&data, 0, sizeof(data));
+        memset(&data, 0, event_size);
 
         data.code = event->code;
         data.type = event->type;
         data.value = event->value;
-        write(fd, &data, sizeof(data));
+        write(fd, &data, event_size);
 
-        write(fd, &event_sync, sizeof(event_sync));
+        write(fd, &event_sync, event_size);
     }
 }
