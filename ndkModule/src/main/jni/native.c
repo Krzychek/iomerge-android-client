@@ -229,16 +229,18 @@ Java_org_kbieron_iomerge_services_InputDevice_keyClick(JNIEnv* env, jobject inst
     int eventCode = getEventCode(c);
     if (eventCode == -1) return;
 
-    struct my_event event;
-    memset(&event, 0, sizeof(struct my_event));
+    struct my_event event[2];
+    memset(&event, 0, 2* sizeof(struct my_event));
 
-    event.type = EV_KEY;
-    event.code = eventCode;
+    event[0].type = EV_KEY;
+    event[0].code = eventCode;
+    event[0].value = 1;
 
-    event.value = 1;
-    send_event(&event, 1);
-    event.value = 0;
-    send_event(&event, 1);
+    event[1].type = EV_KEY;
+    event[1].code = eventCode;
+    event[1].value = 0;
+
+    send_event(event, 2);
 }
 
 /*------------------ SYSTEM -----------------*/

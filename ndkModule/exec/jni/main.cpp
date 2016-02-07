@@ -23,10 +23,12 @@ int main() {
 
     while (1) {
         fp = fopen(NAME, "rb");
-        fgets((char*) &buff, sizeof(buff), fp);
-
-        ioManager.handleMsg(buff);
-
+        int read_count = fread(&buff, sizeof(struct my_event), 4, fp);
         fclose(fp);
+
+        for (int i = 0; i < read_count; ++i) {
+            ioManager.handleMsg(buff + i);
+        }
+
     }
 }
