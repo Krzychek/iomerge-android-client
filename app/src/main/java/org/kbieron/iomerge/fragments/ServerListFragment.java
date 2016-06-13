@@ -73,6 +73,7 @@ public class ServerListFragment extends Fragment implements AdapterView.OnItemCl
 
     @Override
     public void onResume() {
+        super.onResume();
         refresh();
     }
 

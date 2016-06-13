@@ -1,7 +1,10 @@
 package org.kbieron.iomerge.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,7 +44,7 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
     public void showOrMove(Edge edge) {
         switch (edge) {
             case LEFT:
-                windowLayoutParams.gravity = Gravity.TOP | Gravity.RIGHT;
+                windowLayoutParams.gravity = Gravity.TOP | Gravity.END;
                 break;
             default:
             case RIGHT:

@@ -2,8 +2,12 @@ package org.kbieron.iomerge.activities;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,6 +32,8 @@ import org.kbieron.iomerge.services.NetworkManager_;
 
 @EActivity(R.layout.main_activity)
 public class MainActivity extends Activity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private final static int REQUEST_CODE = -1010101;
 
     @ViewById(R.id.toolbar)
     protected Toolbar toolbar;
@@ -56,13 +62,25 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
             if (service instanceof NetworkManager.Binder) {
                 networkManager = ((NetworkManager.Binder) service).getService();
             }
-
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // FIXME
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getApplicationContext())) {
+            startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())));
+        }
+    }
+
+    public void checkDrawOverlayPermission() {
+    }
 
     @AfterInject
     protected void bindServices() {

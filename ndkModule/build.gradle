@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle-experimental:0.4.0'
+        classpath 'com.android.tools.build:gradle-experimental:0.7.0-alpha1'
     }
 }
 
@@ -15,13 +15,13 @@ task compileNdkExec(type: Exec) {
     doLast {
         delete file("src/main/assets/iomerge")
         file("exec/libs/armeabi/iomerge") renameTo file("src/main/assets/iomerge_daemon")
-//        file("exec/libs/armeabi/iomerge") renameTo file("src/arm/assets/iomerge")
-//        file("exec/libs/arm64-v8a/iomerge") renameTo file("src/arm8/assets/iomerge")
-//        file("exec/libs/armeabi-v7a/iomerge") renameTo file("src/arm7/assets/iomerge")
-//        file("exec/libs/x86/iomerge") renameTo file("src/x86/assets/iomerge")
-//        file("exec/libs/x86_64/iomerge") renameTo file("src/x86-64/assets/iomerge")
-//        file("exec/libs/mips/iomerge") renameTo file("src/mips/assets/iomerge")
-//        file("exec/libs/mips64/iomerge") renameTo file("src/mips-64/assets/iomerge")
+        file("exec/libs/armeabi/iomerge") renameTo file("src/arm/assets/iomerge_daemon")
+        file("exec/libs/arm64-v8a/iomerge") renameTo file("src/arm8/assets/iomerge_daemon")
+        file("exec/libs/armeabi-v7a/iomerge") renameTo file("src/arm7/assets/iomerge_daemon")
+        file("exec/libs/x86/iomerge") renameTo file("src/x86/assets/iomerge_daemon")
+        file("exec/libs/x86_64/iomerge") renameTo file("src/x86-64/assets/iomerge_daemon")
+        file("exec/libs/mips/iomerge") renameTo file("src/mips/assets/iomerge_daemon")
+        file("exec/libs/mips64/iomerge") renameTo file("src/mips-64/assets/iomerge_daemon")
     }
 }
 tasks.build.dependsOn(compileNdkExec);
