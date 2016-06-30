@@ -25,86 +25,86 @@ import java.util.regex.Pattern;
 @EFragment(R.layout.server_list)
 public class ServerListFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
-    @Pref
-    protected Preferences_ prefs;
+	@Pref
+	protected Preferences_ prefs;
 
-    @ViewById(R.id.server_list_view)
-    protected ListView listView;
+	@ViewById(R.id.server_list_view)
+	protected ListView listView;
 
-    @ViewById(R.id.address)
-    protected TextView addressView;
+	@ViewById(R.id.address)
+	protected TextView addressView;
 
-    @ViewById(R.id.port)
-    protected TextView portView;
+	@ViewById(R.id.port)
+	protected TextView portView;
 
-    @Bean
-    protected ServerDAO serverDAO;
+	@Bean
+	protected ServerDAO serverDAO;
 
-    private ArrayAdapter<ServerBean> listAdapter;
+	private ArrayAdapter<ServerBean> listAdapter;
 
-    private Pattern addressPattern = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+	private Pattern addressPattern = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+													 "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+													 "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+													 "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
-    private Pattern portPattern = Pattern.compile("^\\d{1,4}$");
+	private Pattern portPattern = Pattern.compile("^\\d{1,4}$");
 
-    @Click(R.id.addBtn)
-    protected void add() {
-        Matcher addressMatcher = addressPattern.matcher(addressView.getText().toString());
-        Matcher portMatcher = portPattern.matcher(portView.getText().toString());
+	@Click(R.id.addBtn)
+	protected void add() {
+		Matcher addressMatcher = addressPattern.matcher(addressView.getText().toString());
+		Matcher portMatcher = portPattern.matcher(portView.getText().toString());
 
-        if (!(addressMatcher.matches() && portMatcher.matches())) {
-            showWrongFormatToast();
-            return;
-        }
+		if (!(addressMatcher.matches() && portMatcher.matches())) {
+			showWrongFormatToast();
+			return;
+		}
 
-        serverDAO.open();
-        serverDAO.createServer(addressMatcher.group(), Integer.parseInt(portMatcher.group()));
-        serverDAO.close();
-        addressView.setText("");
-        portView.setText("");
-        refresh();
-    }
+		serverDAO.open();
+		serverDAO.createServer(addressMatcher.group(), Integer.parseInt(portMatcher.group()));
+		serverDAO.close();
+		addressView.setText("");
+		portView.setText("");
+		refresh();
+	}
 
-    private void showWrongFormatToast() {
-        Toast.makeText(getActivity(), R.string.wrong_address_format, Toast.LENGTH_SHORT).show();
-    }
+	private void showWrongFormatToast() {
+		Toast.makeText(getActivity(), R.string.wrong_address_format, Toast.LENGTH_SHORT).show();
+	}
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
-    }
+	@Override
+	public void onResume() {
+		super.onResume();
+		refresh();
+	}
 
-    private void refresh() {
-        serverDAO.open();
-        listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, serverDAO.getAllServers());
-        listView.setOnItemClickListener(this);
-        listView.setOnItemLongClickListener(this);
-        listView.setAdapter(listAdapter);
-        serverDAO.close();
+	private void refresh() {
+		serverDAO.open();
+		listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, serverDAO.getAllServers());
+		listView.setOnItemClickListener(this);
+		listView.setOnItemLongClickListener(this);
+		listView.setAdapter(listAdapter);
+		serverDAO.close();
 
 
-    }
+	}
 
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        ServerBean item = listAdapter.getItem(position);
-        serverDAO.open();
-        serverDAO.deleteServer(item);
-        serverDAO.close();
-        refresh();
-        return true;
-    }
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		ServerBean item = listAdapter.getItem(position);
+		serverDAO.open();
+		serverDAO.deleteServer(item);
+		serverDAO.close();
+		refresh();
+		return true;
+	}
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        ServerBean item = listAdapter.getItem(position);
-        prefs.edit() //
-                .serverAddress().put(item.getAddress()) //
-                .serverPort().put(item.getPort()) //
-                .apply();
-        refresh();
-    }
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		ServerBean item = listAdapter.getItem(position);
+		prefs.edit() //
+				.serverAddress().put(item.getAddress()) //
+				.serverPort().put(item.getPort()) //
+				.apply();
+		refresh();
+	}
 }

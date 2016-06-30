@@ -33,101 +33,101 @@ import org.kbieron.iomerge.services.NetworkManager_;
 @EActivity(R.layout.main_activity)
 public class MainActivity extends Activity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final static int REQUEST_CODE = -1010101;
+	private final static int REQUEST_CODE = -1010101;
 
-    @ViewById(R.id.toolbar)
-    protected Toolbar toolbar;
+	@ViewById(R.id.toolbar)
+	protected Toolbar toolbar;
 
-    @ViewById(R.id.drawer_layout)
-    protected DrawerLayout drawer;
+	@ViewById(R.id.drawer_layout)
+	protected DrawerLayout drawer;
 
-    @Pref
-    protected Preferences_ prefs;
+	@Pref
+	protected Preferences_ prefs;
 
-    @ViewById(R.id.active_server_address)
-    protected TextView activeServerView;
+	@ViewById(R.id.active_server_address)
+	protected TextView activeServerView;
 
-    @ViewById(R.id.nav_view)
-    protected NavigationView navigationView;
+	@ViewById(R.id.nav_view)
+	protected NavigationView navigationView;
 
-    @Bean
-    protected InputDevice inputDevice;
+	@Bean
+	protected InputDevice inputDevice;
 
-    protected NetworkManager networkManager;
+	protected NetworkManager networkManager;
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+	private ServiceConnection mConnection = new ServiceConnection() {
 
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            if (service instanceof NetworkManager.Binder) {
-                networkManager = ((NetworkManager.Binder) service).getService();
-            }
-        }
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			if (service instanceof NetworkManager.Binder) {
+				networkManager = ((NetworkManager.Binder) service).getService();
+			}
+		}
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-    };
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+		}
+	};
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+	@Override
+	protected void onStart() {
+		super.onStart();
 
-        // FIXME
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getApplicationContext())) {
-            startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())));
-        }
-    }
+		// FIXME
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getApplicationContext())) {
+			startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())));
+		}
+	}
 
-    public void checkDrawOverlayPermission() {
-    }
+	public void checkDrawOverlayPermission() {
+	}
 
-    @AfterInject
-    protected void bindServices() {
-        bindService(NetworkManager_.intent(getApplication()).get(), mConnection, BIND_AUTO_CREATE);
-    }
+	@AfterInject
+	protected void bindServices() {
+		bindService(NetworkManager_.intent(getApplication()).get(), mConnection, BIND_AUTO_CREATE);
+	}
 
-    @AfterViews
-    protected void afterViews() {
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-            @Override
-            public void onDrawerStateChanged(int newState) {
-                if (newState != DrawerLayout.STATE_IDLE) {
-                    ((TextView) drawer.findViewById(R.id.active_server_address)) //
-                            .setText(prefs.serverAddress().get() + ":" + prefs.serverPort().get());
-                }
-                super.onDrawerStateChanged(newState);
-            }
-        };
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+	@AfterViews
+	protected void afterViews() {
+		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+			@Override
+			public void onDrawerStateChanged(int newState) {
+				if (newState != DrawerLayout.STATE_IDLE) {
+					((TextView) drawer.findViewById(R.id.active_server_address)) //
+							.setText(prefs.serverAddress().get() + ":" + prefs.serverPort().get());
+				}
+				super.onDrawerStateChanged(newState);
+			}
+		};
+		drawer.setDrawerListener(toggle);
+		toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(this);
-    }
+		navigationView.setNavigationItemSelectedListener(this);
+	}
 
-    @Override
-    public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+	@Override
+	public void onBackPressed() {
+		if (drawer.isDrawerOpen(GravityCompat.START)) {
+			drawer.closeDrawer(GravityCompat.START);
+		} else {
+			super.onBackPressed();
+		}
+	}
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+	@Override
+	public boolean onNavigationItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.nav_connect:
-                networkManager.connect();
-                break;
-            case R.id.nav_disconnect:
-                networkManager.disconnect();
-                break;
-            default:
-                Log.w("MainActivity", "Not supported navigation item");
-        }
+		switch (item.getItemId()) {
+			case R.id.nav_connect:
+				networkManager.connect();
+				break;
+			case R.id.nav_disconnect:
+				networkManager.disconnect();
+				break;
+			default:
+				Log.w("MainActivity", "Not supported navigation item");
+		}
 
-        return true;
-    }
+		return true;
+	}
 }

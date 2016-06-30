@@ -6,8 +6,8 @@ import org.androidannotations.annotations.sharedpreferences.SharedPref;
 @SharedPref(SharedPref.Scope.UNIQUE)
 public interface Preferences {
 
-    String serverAddress();
+	String serverAddress();
 
-    int serverPort();
+	int serverPort();
 
 }

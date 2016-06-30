@@ -25,81 +25,81 @@ import pl.kbieron.iomerge.model.Edge;
 @EService
 public class NetworkManager extends Service {
 
-    @Bean
-    protected ConnectionHandler connectionHandler;
+	@Bean
+	protected ConnectionHandler connectionHandler;
 
-    @Bean
-    protected InputDevice inputDevice;
+	@Bean
+	protected InputDevice inputDevice;
 
-    @Bean
-    protected NotificationFactory notificationFactory;
+	@Bean
+	protected NotificationFactory notificationFactory;
 
-    @Pref
-    protected Preferences_ prefs;
+	@Pref
+	protected Preferences_ prefs;
 
-    @SystemService
-    protected WindowManager windowManager;
+	@SystemService
+	protected WindowManager windowManager;
 
-    @Bean
-    protected EdgeTriggerView edgeTriggerView;
+	@Bean
+	protected EdgeTriggerView edgeTriggerView;
 
-    @Override
-    public Binder onBind(Intent intent) {
-        return new Binder();
-    }
+	@Override
+	public Binder onBind(Intent intent) {
+		return new Binder();
+	}
 
-    @Override
-    public void onDestroy() {
-        disconnect();
-    }
+	@Override
+	public void onDestroy() {
+		disconnect();
+	}
 
-    @Background
-    public void connect() {
-        if (!connectionHandler.isConnected()) {
-            startForeground(1, notificationFactory.serverConnected(prefs.serverAddress().get(), prefs.serverPort().get()));
+	@Background
+	public void connect() {
+		if (!connectionHandler.isConnected()) {
+			startForeground(1, notificationFactory.serverConnected(prefs.serverAddress().get(), prefs.serverPort().get()));
 
-            try {
-                inputDevice.startNativeDaemon();
+			try {
+				inputDevice.startNativeDaemon();
 
-                Socket client = new Socket();
-                client.connect(new InetSocketAddress(prefs.serverAddress().get(), prefs.serverPort().get()));
+				Socket client = new Socket();
+				client.connect(new InetSocketAddress(prefs.serverAddress().get(), prefs.serverPort().get()));
 
-                showEdgeTrigger(connectionHandler);
-                connectionHandler.startReceiving(client);
+				showEdgeTrigger(connectionHandler);
+				connectionHandler.startReceiving(client);
 
-            } catch (IOException | InterruptedException e) {
-                Log.i("NetworkManager", "disconnected", e);
-            } finally {
-                disconnect();
-            }
+			} catch (IOException | InterruptedException e) {
+				Log.i("NetworkManager", "disconnected", e);
+			} finally {
+				disconnect();
+			}
 
-        } else {
-            Log.i("NetworkManager", "already connected");
-        }
-    }
+		} else {
+			Log.i("NetworkManager", "already connected");
+		}
+	}
 
-    @UiThread
-    protected void showEdgeTrigger(EdgeTriggerView.OnTrigListener onTrigListener) {
-        edgeTriggerView.setOnTrigListener(onTrigListener);
-        edgeTriggerView.showOrMove(Edge.LEFT);
-    }
+	@UiThread
+	protected void showEdgeTrigger(EdgeTriggerView.OnTrigListener onTrigListener) {
+		edgeTriggerView.setOnTrigListener(onTrigListener);
+		edgeTriggerView.showOrMove(Edge.LEFT);
+	}
 
-    @Background
-    public void disconnect() {
-        Log.i("NetworkManager", "Disconnecting");
-        if (edgeTriggerView.isAttachedToWindow()){
-            windowManager.removeView(edgeTriggerView);
-        }
-        connectionHandler.disconnect();
-        inputDevice.stop();
-        stopForeground(true);
-    }
+	@Background
+	public void disconnect() {
+		Log.i("NetworkManager", "Disconnecting");
+		if (edgeTriggerView.isAttachedToWindow()) {
+			windowManager.removeView(edgeTriggerView);
+		}
+		connectionHandler.disconnect();
+		inputDevice.stop();
+		stopForeground(true);
+	}
 
 
-    public class Binder extends android.os.Binder {
+	public class Binder extends android.os.Binder {
 
-        public NetworkManager getService() {
-            return NetworkManager.this;
-        }
-    }
+		public NetworkManager getService() {
+			return NetworkManager.this;
+		}
+	}
 }

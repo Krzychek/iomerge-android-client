@@ -21,69 +21,69 @@ import static org.kbieron.iomerge.database.MySQLiteServerOpenHelper.TABLE;
 @EBean
 public class ServerDAO {
 
-    private SQLiteDatabase database;
+	private SQLiteDatabase database;
 
-    @Bean
-    protected MySQLiteServerOpenHelper dbHelper;
+	@Bean
+	protected MySQLiteServerOpenHelper dbHelper;
 
-    private String[] COLUMNS = new String[]{ID_COL, ADDRESS_COL, PORT_COL};
+	private String[] COLUMNS = new String[]{ID_COL, ADDRESS_COL, PORT_COL};
 
 
-    public void open() throws SQLException {
-        database = dbHelper.getWritableDatabase();
-    }
+	public void open() throws SQLException {
+		database = dbHelper.getWritableDatabase();
+	}
 
-    public void close() {
-        dbHelper.close();
-    }
+	public void close() {
+		dbHelper.close();
+	}
 
-    public ServerBean createServer(String address, int port) {
+	public ServerBean createServer(String address, int port) {
 
-        ContentValues values = new ContentValues();
-        values.put(ADDRESS_COL, address);
-        values.put(PORT_COL, port);
+		ContentValues values = new ContentValues();
+		values.put(ADDRESS_COL, address);
+		values.put(PORT_COL, port);
 
-        long insertId = database.insert(TABLE, null, values);
+		long insertId = database.insert(TABLE, null, values);
 
-        if (insertId != -1) {
-            ServerBean server = new ServerBean();
-            server.setId(insertId);
-            server.setAddress(address);
-            server.setPort(port);
-            return server;
-        } else {
-            return null;
-        }
+		if (insertId != -1) {
+			ServerBean server = new ServerBean();
+			server.setId(insertId);
+			server.setAddress(address);
+			server.setPort(port);
+			return server;
+		} else {
+			return null;
+		}
 
-    }
+	}
 
-    public void deleteServer(ServerBean server) {
-        database.delete(TABLE, ID_COL + " = " + server.getId(), null);
-    }
+	public void deleteServer(ServerBean server) {
+		database.delete(TABLE, ID_COL + " = " + server.getId(), null);
+	}
 
-    public List<ServerBean> getAllServers() {
+	public List<ServerBean> getAllServers() {
 
-        List<ServerBean> servers = new ArrayList<ServerBean>();
+		List<ServerBean> servers = new ArrayList<ServerBean>();
 
-        Cursor cursor = database.query(TABLE, COLUMNS, null, null, null, null, null);
+		Cursor cursor = database.query(TABLE, COLUMNS, null, null, null, null, null);
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            ServerBean server = cursorToServer(cursor);
-            servers.add(server);
-            cursor.moveToNext();
-        }
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			ServerBean server = cursorToServer(cursor);
+			servers.add(server);
+			cursor.moveToNext();
+		}
 
-        cursor.close();
-        return servers;
-    }
+		cursor.close();
+		return servers;
+	}
 
-    private ServerBean cursorToServer(Cursor cursor) {
-        ServerBean comment = new ServerBean();
-        comment.setId(cursor.getLong(0));
-        comment.setAddress(cursor.getString(1));
-        comment.setPort(cursor.getInt(2));
-        return comment;
-    }
+	private ServerBean cursorToServer(Cursor cursor) {
+		ServerBean comment = new ServerBean();
+		comment.setId(cursor.getLong(0));
+		comment.setAddress(cursor.getString(1));
+		comment.setPort(cursor.getInt(2));
+		return comment;
+	}
 }
 

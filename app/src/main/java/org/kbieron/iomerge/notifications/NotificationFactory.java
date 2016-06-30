@@ -15,24 +15,24 @@ import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
 @EBean(scope = EBean.Scope.Singleton)
 public class NotificationFactory {
 
-    @StringRes(R.string.server_connected_text)
-    protected static String connectedText;
+	@StringRes(R.string.server_connected_text)
+	protected static String connectedText;
 
-    @StringRes(R.string.app_name)
-    protected static String appName;
+	@StringRes(R.string.app_name)
+	protected static String appName;
 
-    @RootContext
-    protected Context context;
+	@RootContext
+	protected Context context;
 
-    String connectedTicker;
+	String connectedTicker;
 
-    public Notification serverConnected(String address, int port) {
-        return new NotificationCompat.Builder(context) //
-                .setSmallIcon(android.R.drawable.ic_menu_camera)
-                .setContentTitle(appName) //
-                .setContentText(connectedText + address + ":" + port) //
-                .setPriority(PRIORITY_MIN) //
-                .setTicker(connectedTicker) //
-                .build();
-    }
+	public Notification serverConnected(String address, int port) {
+		return new NotificationCompat.Builder(context) //
+				.setSmallIcon(android.R.drawable.ic_menu_camera)
+				.setContentTitle(appName) //
+				.setContentText(connectedText + address + ":" + port) //
+				.setPriority(PRIORITY_MIN) //
+				.setTicker(connectedTicker) //
+				.build();
+	}
 }

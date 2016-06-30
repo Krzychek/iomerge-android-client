@@ -25,129 +25,129 @@ import pl.kbieron.iomerge.model.message.misc.RemoteExit;
 @EBean(scope = EBean.Scope.Singleton)
 class ConnectionHandler extends MessageProcessorAdapter implements ClipboardManager.OnPrimaryClipChangedListener, EdgeTriggerView.OnTrigListener {
 
-    @Bean
-    protected InputDevice inputDevice;
+	@Bean
+	protected InputDevice inputDevice;
 
-    @Bean
-    protected EdgeTriggerView edgeTrigger;
+	@Bean
+	protected EdgeTriggerView edgeTrigger;
 
-    @SystemService
-    protected ClipboardManager clipboardManager;
+	@SystemService
+	protected ClipboardManager clipboardManager;
 
-    private ObjectOutputStream serverOutputStream;
+	private ObjectOutputStream serverOutputStream;
 
-    private Socket client;
+	private Socket client;
 
 
-    public void startReceiving(Socket client) throws IOException {
-        this.client = client;
-        serverOutputStream = new ObjectOutputStream(client.getOutputStream());
-        clipboardManager.addPrimaryClipChangedListener(this);
+	public void startReceiving(Socket client) throws IOException {
+		this.client = client;
+		serverOutputStream = new ObjectOutputStream(client.getOutputStream());
+		clipboardManager.addPrimaryClipChangedListener(this);
 
-        ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
-        while (true) {
-            try {
-                ((Message) objectInputStream.readObject()).process(this);
-            } catch (ClassNotFoundException | ClassCastException e) {
-                Log.w("NetworkManager", "problem while receiving msg", e);
-            }
-        }
-    }
+		ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
+		while (true) {
+			try {
+				((Message) objectInputStream.readObject()).process(this);
+			} catch (ClassNotFoundException | ClassCastException e) {
+				Log.w("NetworkManager", "problem while receiving msg", e);
+			}
+		}
+	}
 
-    @Override
-    public void mousePress() {
-        inputDevice.mousePress();
-    }
+	@Override
+	public void mousePress() {
+		inputDevice.mousePress();
+	}
 
-    @Override
-    public void mouseRelease() {
-        inputDevice.mouseRelease();
-    }
+	@Override
+	public void mouseRelease() {
+		inputDevice.mouseRelease();
+	}
 
-    @Override
-    public void mouseSync(int x, int y) {
-        inputDevice.mouseMove(x, y);
-    }
+	@Override
+	public void mouseSync(int x, int y) {
+		inputDevice.mouseMove(x, y);
+	}
 
-    @Override
-    public void mouseWheel(int move) {
-        inputDevice.mouseWheel(move);
-    }
+	@Override
+	public void mouseWheel(int move) {
+		inputDevice.mouseWheel(move);
+	}
 
-    @Override
-    public void backBtnClick() {
-        inputDevice.emitKeyEvent(KeyEvent.KEYCODE_BACK);
-    }
+	@Override
+	public void backBtnClick() {
+		inputDevice.emitKeyEvent(KeyEvent.KEYCODE_BACK);
+	}
 
-    @Override
-    public void homeBtnClick() {
-        inputDevice.emitKeyEvent(KeyEvent.KEYCODE_HOME);
-    }
+	@Override
+	public void homeBtnClick() {
+		inputDevice.emitKeyEvent(KeyEvent.KEYCODE_HOME);
+	}
 
-    @Override
-    public void menuBtnClick() {
-        inputDevice.emitKeyEvent(KeyEvent.KEYCODE_MENU);
-    }
+	@Override
+	public void menuBtnClick() {
+		inputDevice.emitKeyEvent(KeyEvent.KEYCODE_MENU);
+	}
 
-    @Override
-    public void edgeSync(Edge edge) {
-        edgeTrigger.showOrMove(edge);
-    }
+	@Override
+	public void edgeSync(Edge edge) {
+		edgeTrigger.showOrMove(edge);
+	}
 
-    @Override
-    public void keyPress(int keyCode) {
-        inputDevice.keyPress(keyCode);
-    }
+	@Override
+	public void keyPress(int keyCode) {
+		inputDevice.keyPress(keyCode);
+	}
 
-    @Override
-    public void keyRelease(int keyCode) {
-        inputDevice.keyRelease(keyCode);
-    }
+	@Override
+	public void keyRelease(int keyCode) {
+		inputDevice.keyRelease(keyCode);
+	}
 
-    @Override
-    public void clipboardSync(String text) {
-        clipboardManager.removePrimaryClipChangedListener(this);
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("IOMerge", text));
-        clipboardManager.addPrimaryClipChangedListener(this);
-    }
+	@Override
+	public void clipboardSync(String text) {
+		clipboardManager.removePrimaryClipChangedListener(this);
+		clipboardManager.setPrimaryClip(ClipData.newPlainText("IOMerge", text));
+		clipboardManager.addPrimaryClipChangedListener(this);
+	}
 
-    @Override
-    public void keyClick(int i) {
-        inputDevice.keyClick(i);
-    }
+	@Override
+	public void keyClick(int i) {
+		inputDevice.keyClick(i);
+	}
 
-    @Override
-    public void onPrimaryClipChanged() {
-        String clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString();
-        try {
-            serverOutputStream.writeObject(new ClipboardSync(clipboardText));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	@Override
+	public void onPrimaryClipChanged() {
+		String clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString();
+		try {
+			serverOutputStream.writeObject(new ClipboardSync(clipboardText));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    public void sendExit() {
-        try {
-            serverOutputStream.writeObject(new RemoteExit());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	public void sendExit() {
+		try {
+			serverOutputStream.writeObject(new RemoteExit());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    public void disconnect() {
-        try {
-            if (client != null) client.close();
-        } catch (IOException ignored) {}
+	public void disconnect() {
+		try {
+			if (client != null) client.close();
+		} catch (IOException ignored) {}
 
-        clipboardManager.removePrimaryClipChangedListener(this);
-    }
+		clipboardManager.removePrimaryClipChangedListener(this);
+	}
 
-    public boolean isConnected() {
-        return client != null && client.isConnected();
-    }
+	public boolean isConnected() {
+		return client != null && client.isConnected();
+	}
 
-    @Override
-    public void onTrig() {
-        sendExit();
-    }
+	@Override
+	public void onTrig() {
+		sendExit();
+	}
 }
