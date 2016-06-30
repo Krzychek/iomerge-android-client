@@ -21,62 +21,62 @@ import pl.kbieron.iomerge.model.Edge;
 @EBean(scope = EBean.Scope.Singleton)
 public class EdgeTriggerView extends View implements View.OnHoverListener {
 
-    @SystemService
-    protected WindowManager windowManager;
+	@SystemService
+	protected WindowManager windowManager;
 
-    private OnTrigListener trigMe;
+	private OnTrigListener trigMe;
 
-    private WindowManager.LayoutParams windowLayoutParams;
+	private WindowManager.LayoutParams windowLayoutParams;
 
-    public EdgeTriggerView(Context context) {
-        super(context);
-        setOnHoverListener(this);
+	public EdgeTriggerView(Context context) {
+		super(context);
+		setOnHoverListener(this);
 
-        windowLayoutParams = new WindowManager.LayoutParams( //
-                WindowManager.LayoutParams.WRAP_CONTENT, //
-                WindowManager.LayoutParams.WRAP_CONTENT, //
-                WindowManager.LayoutParams.TYPE_PRIORITY_PHONE, //
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, //
-                PixelFormat.TRANSPARENT);
-    }
+		windowLayoutParams = new WindowManager.LayoutParams( //
+				WindowManager.LayoutParams.WRAP_CONTENT, //
+				WindowManager.LayoutParams.WRAP_CONTENT, //
+				WindowManager.LayoutParams.TYPE_PRIORITY_PHONE, //
+				WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, //
+				PixelFormat.TRANSPARENT);
+	}
 
-    @UiThread
-    public void showOrMove(Edge edge) {
-        switch (edge) {
-            case LEFT:
-                windowLayoutParams.gravity = Gravity.TOP | Gravity.END;
-                break;
-            default:
-            case RIGHT:
-                windowLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
-        }
+	@UiThread
+	public void showOrMove(Edge edge) {
+		switch (edge) {
+			case LEFT:
+				windowLayoutParams.gravity = Gravity.TOP | Gravity.END;
+				break;
+			default:
+			case RIGHT:
+				windowLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
+		}
 
-        if (getWindowToken() != null) {
-            windowManager.updateViewLayout(this, windowLayoutParams);
-        } else {
-            windowManager.addView(this, windowLayoutParams);
-        }
-    }
+		if (getWindowToken() != null) {
+			windowManager.updateViewLayout(this, windowLayoutParams);
+		} else {
+			windowManager.addView(this, windowLayoutParams);
+		}
+	}
 
-    @Override
-    public boolean onHover(View v, MotionEvent event) {
-        if (MotionEvent.ACTION_HOVER_ENTER == event.getAction()) {
-            trigMe.onTrig();
-        }
-        return false;
-    }
+	@Override
+	public boolean onHover(View v, MotionEvent event) {
+		if (MotionEvent.ACTION_HOVER_ENTER == event.getAction()) {
+			trigMe.onTrig();
+		}
+		return false;
+	}
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(1, heightMeasureSpec);
-    }
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		setMeasuredDimension(1, heightMeasureSpec);
+	}
 
-    public void setOnTrigListener(OnTrigListener trigMe) {
-        this.trigMe = trigMe;
-    }
+	public void setOnTrigListener(OnTrigListener trigMe) {
+		this.trigMe = trigMe;
+	}
 
-    public interface OnTrigListener {
+	public interface OnTrigListener {
 
-        void onTrig();
-    }
+		void onTrig();
+	}
 }
