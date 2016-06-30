@@ -1,54 +1,61 @@
 buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle-experimental:0.7.0-alpha1'
-    }
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle-experimental:0.7.0-alpha1'
+	}
 }
 
 apply plugin: 'com.android.model.library'
 
 task compileNdkExec(type: Exec) {
-    commandLine 'ndk-build', '-C', file('exec').absolutePath
+	commandLine 'ndk-build', '-C', file('exec').absolutePath
+	def ndkOutDir = "exec/libs"
+	def srcDir = "src"
 
-    doLast {
-        delete file("src/main/assets/iomerge")
-        file("exec/libs/armeabi/iomerge") renameTo file("src/main/assets/iomerge_daemon")
-        file("exec/libs/armeabi/iomerge") renameTo file("src/arm/assets/iomerge_daemon")
-        file("exec/libs/arm64-v8a/iomerge") renameTo file("src/arm8/assets/iomerge_daemon")
-        file("exec/libs/armeabi-v7a/iomerge") renameTo file("src/arm7/assets/iomerge_daemon")
-        file("exec/libs/x86/iomerge") renameTo file("src/x86/assets/iomerge_daemon")
-        file("exec/libs/x86_64/iomerge") renameTo file("src/x86-64/assets/iomerge_daemon")
-        file("exec/libs/mips/iomerge") renameTo file("src/mips/assets/iomerge_daemon")
-        file("exec/libs/mips64/iomerge") renameTo file("src/mips-64/assets/iomerge_daemon")
-    }
+	def copyDaemon = { inputType, outputType ->
+		delete file("$srcDir/$outputType/assets/iomerge")
+		file("$srcDir/$outputType/assets/iomerge_daemon") getParentFile() mkdirs()
+		file("$ndkOutDir/$inputType/iomerge") renameTo file("$srcDir/$outputType/assets/iomerge_daemon")
+	}
+
+	copyDaemon('armeabi', 'main')
+	copyDaemon('armeabi', 'arm')
+	copyDaemon('arm64-v8a', 'arm8')
+	copyDaemon('armeabi-v7a', 'arm7')
+	copyDaemon('x86', 'x86')
+	copyDaemon('x86_64', 'x86-64')
+	copyDaemon('mips', 'mips')
+	copyDaemon('mips64', 'mips-64')
 }
-tasks.build.dependsOn(compileNdkExec);
 
+gradle.projectsEvaluated {
+	preBuild.dependsOn(compileNdkExec)
+}
 
 model {
-    android {
-        compileSdkVersion = 23
-        buildToolsVersion = "23.0.2"
+	android {
+		compileSdkVersion = 23
+		buildToolsVersion = "23.0.2"
 
-        defaultConfig.with {
-            minSdkVersion.apiLevel = 15
-            targetSdkVersion.apiLevel = 23
-            versionCode = 1
-            versionName = "1.0"
-        }
+		defaultConfig.with {
+			minSdkVersion.apiLevel = 15
+			targetSdkVersion.apiLevel = 23
+			versionCode = 1
+			versionName = "1.0"
+		}
 
-    }
-    android.buildTypes {
-        release {
-            minifyEnabled = false
-            proguardFiles.add(file("proguard-rules.pro"))
-        }
-    }
+	}
+	android.buildTypes {
+		release {
+			minifyEnabled = false
+			proguardFiles.add(file("proguard-rules.pro"))
+		}
+	}
 
-    android.ndk {
-        moduleName = "native"
-    }
+	android.ndk {
+		moduleName = "native"
+	}
 
 }

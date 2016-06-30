@@ -2,7 +2,6 @@ package org.kbieron.iomerge.services;
 
 import android.content.Context;
 import android.util.Log;
-
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 
@@ -32,11 +31,17 @@ public class InputDevice {
 		try (FileOutputStream output = new FileOutputStream(new File(outPath))) {
 			copy(context.getAssets().open(DAEMON_NAME), output);
 		}
+		try {
+			Runtime.getRuntime().exec(new String[]{"su", "-C", "chmod 777 " + outPath}).waitFor();
+			initializePipe();
 
-		Runtime.getRuntime().exec(new String[]{"su", "-C", "chmod 777 " + outPath}).waitFor();
-		initializePipe();
-
-		Runtime.getRuntime().exec(new String[]{"su", "-C", outPath});
+			Process exec = Runtime.getRuntime().exec(new String[]{"su", "-C", outPath});
+			Thread.sleep(100);
+			int exitValue = exec.exitValue();
+			throw new RuntimeException("Daemon failed to start, exited with value: " + exitValue);
+		} catch (IllegalThreadStateException ignored) {
+			// ignore
+		}
 	}
 
 	synchronized public void stop() {
