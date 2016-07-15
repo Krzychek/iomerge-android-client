@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import com.github.krzychek.server.model.Edge;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
@@ -15,11 +16,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import pl.kbieron.iomerge.model.Edge;
-import pl.kbieron.iomerge.model.MessageProcessorAdapter;
-import pl.kbieron.iomerge.model.message.Message;
-import pl.kbieron.iomerge.model.message.misc.ClipboardSync;
-import pl.kbieron.iomerge.model.message.misc.RemoteExit;
+import com.github.krzychek.server.model.MessageProcessorAdapter;
+import com.github.krzychek.server.model.message.Message;
+import com.github.krzychek.server.model.message.misc.ClipboardSync;
+import com.github.krzychek.server.model.message.misc.RemoteExit;
 
 
 @EBean(scope = EBean.Scope.Singleton)

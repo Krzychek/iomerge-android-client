@@ -1,13 +1,12 @@
 task clean(type: Delete) {
-    delete rootProject.buildDir
+	delete rootProject.buildDir
 }
 
 allprojects {
-    repositories {
-        mavenLocal()
-        jcenter()
-        maven {
-            url = 'https://oss.sonatype.org/content/repositories/snapshots'
-        }
-    }
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+		maven { url "https://jitpack.io" }
+	}
 }
