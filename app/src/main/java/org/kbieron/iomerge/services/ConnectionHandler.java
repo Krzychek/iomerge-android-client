@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import com.github.krzychek.server.model.Edge;
 import com.github.krzychek.server.model.MessageProcessorAdapter;
 import com.github.krzychek.server.model.message.misc.ClipboardSync;
+import com.github.krzychek.server.model.message.misc.Heartbeat;
 import com.github.krzychek.server.model.message.misc.RemoteExit;
 import com.github.krzychek.server.model.serialization.MessageIOFacade;
 import org.androidannotations.annotations.Bean;
@@ -15,6 +16,8 @@ import org.androidannotations.annotations.SystemService;
 import org.kbieron.iomerge.views.EdgeTriggerView;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 @EBean(scope = EBean.Scope.Singleton)
@@ -30,11 +33,29 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	ClipboardManager clipboardManager;
 
 	private MessageIOFacade messageIOFacade;
+	private ScheduledThreadPoolExecutor heartbeatTimer;
+
+	private void startHeartbeatTimer() {
+		final Heartbeat message = new Heartbeat();
+		heartbeatTimer = new ScheduledThreadPoolExecutor(1);
+		heartbeatTimer.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					messageIOFacade.sendMessage(message);
+				} catch (IOException e) {
+					Log.i("Heartbeattimer", "IOException while sending hearbeat", e);
+					disconnect();
+				}
+			}
+		}, 2, 2, TimeUnit.SECONDS);
+	}
 
 
 	void connect(MessageIOFacade client) throws IOException {
 		messageIOFacade = client;
 		clipboardManager.addPrimaryClipChangedListener(this);
+		startHeartbeatTimer();
 
 		while (true) {
 			try {
@@ -131,6 +152,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 			if (messageIOFacade != null) messageIOFacade.close();
 		} catch (IOException ignored) {
 		}
+		heartbeatTimer.shutdownNow();
 
 		clipboardManager.removePrimaryClipChangedListener(this);
 	}
