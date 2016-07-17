@@ -21,18 +21,18 @@ import java.io.IOException;
 class ConnectionHandler extends MessageProcessorAdapter implements ClipboardManager.OnPrimaryClipChangedListener, EdgeTriggerView.OnTrigListener {
 
 	@Bean
-	protected InputDevice inputDevice;
+	InputDevice inputDevice;
 
 	@Bean
-	protected EdgeTriggerView edgeTrigger;
+	EdgeTriggerView edgeTrigger;
 
 	@SystemService
-	protected ClipboardManager clipboardManager;
+	ClipboardManager clipboardManager;
 
 	private MessageIOFacade messageIOFacade;
 
 
-	public void connect(MessageIOFacade client) throws IOException {
+	void connect(MessageIOFacade client) throws IOException {
 		messageIOFacade = client;
 		clipboardManager.addPrimaryClipChangedListener(this);
 

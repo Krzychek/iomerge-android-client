@@ -1,7 +1,6 @@
 package org.kbieron.iomerge.database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -63,7 +62,7 @@ public class ServerDAO {
 
 	public List<ServerBean> getAllServers() {
 
-		List<ServerBean> servers = new ArrayList<ServerBean>();
+		List<ServerBean> servers = new ArrayList<>();
 
 		Cursor cursor = database.query(TABLE, COLUMNS, null, null, null, null, null);
 

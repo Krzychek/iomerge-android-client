@@ -16,7 +16,7 @@ import org.androidannotations.annotations.UiThread;
 public class EdgeTriggerView extends View implements View.OnHoverListener {
 
 	@SystemService
-	protected WindowManager windowManager;
+	WindowManager windowManager;
 
 	private OnTrigListener trigMe;
 

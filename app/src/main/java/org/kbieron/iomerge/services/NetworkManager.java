@@ -20,25 +20,25 @@ import java.io.IOException;
 
 
 @EService
-public class NetworkManager extends Service {
+public abstract class NetworkManager extends Service {
 
 	@Bean
-	protected ConnectionHandler connectionHandler;
+	ConnectionHandler connectionHandler;
 
 	@Bean
-	protected InputDevice inputDevice;
+	InputDevice inputDevice;
 
 	@Bean
-	protected NotificationFactory notificationFactory;
+	NotificationFactory notificationFactory;
 
 	@Pref
-	protected Preferences_ prefs;
+	Preferences_ prefs;
 
 	@SystemService
-	protected WindowManager windowManager;
+	WindowManager windowManager;
 
 	@Bean
-	protected EdgeTriggerView edgeTriggerView;
+	EdgeTriggerView edgeTriggerView;
 
 	@Override
 	public Binder onBind(Intent intent) {

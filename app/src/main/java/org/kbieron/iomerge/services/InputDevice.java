@@ -24,7 +24,7 @@ public class InputDevice {
 	@RootContext
 	protected Context context;
 
-	synchronized protected void startNativeDaemon() throws IOException, InterruptedException {
+	synchronized void startNativeDaemon() throws IOException, InterruptedException {
 		stop();
 
 		String outPath = context.getCacheDir().getAbsolutePath() + File.separator + DAEMON_NAME;
@@ -44,7 +44,7 @@ public class InputDevice {
 		}
 	}
 
-	synchronized public void stop() {
+	synchronized void stop() {
 
 		try {
 			//noinspection SpellCheckingInspection

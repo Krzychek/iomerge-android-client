@@ -1,18 +1,15 @@
 <resources>
-    <string name="app_name" translatable="false">IOMerge</string>
+	<string name="app_name" translatable="false">IOMerge</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+	<string name="navigation_drawer_open">Open navigation drawer</string>
+	<string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="connect">Connect</string>
-    <string name="disconnect">Disconnect</string>
-    <string name="drawer_main_title">Client</string>
-    <string name="serverAddress">Server address</string>
-    <string name="serverPort">Server port</string>
+	<string name="connect">Connect</string>
+	<string name="disconnect">Disconnect</string>
 
-    <!-- Notification: server connected -->
-    <string name="server_connected_ticker">IOMerge: connected</string>
-    <string name="server_connected_text">connected to </string>
-    <string name="add">add</string>
-    <string name="wrong_address_format">Wrong IP adress</string>
+	<!-- Notification: server connected -->
+	<string name="server_connected_ticker">IOMerge: connected</string>
+	<string name="server_connected_text">connected to</string>
+	<string name="add">add</string>
+	<string name="wrong_address_format">Wrong IP address</string>
 </resources>

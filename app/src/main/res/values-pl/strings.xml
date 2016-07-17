@@ -1,14 +1,11 @@
 <resources>
-    <string name="navigation_drawer_open">Otwórz pułkę nawigacyjną</string>
-    <string name="navigation_drawer_close">Zamknij pułkę nawigacyjną</string>
+	<string name="navigation_drawer_open">Otwórz pułkę nawigacyjną</string>
+	<string name="navigation_drawer_close">Zamknij pułkę nawigacyjną</string>
 
-    <string name="connect">Połącz</string>
-    <string name="disconnect">Rozłącz</string>
-    <string name="drawer_main_title">Klient</string>
-    <string name="serverAddress">Adres serwera</string>
-    <string name="serverPort">Port serwera</string>
-    <string name="server_connected_text">połączono z </string>
-    <string name="server_connected_ticker">IOMerge: połączono</string>
-    <string name="add">dodaj</string>
-    <string name="wrong_address_format">Niepoprawny format adresu IP</string>
+	<string name="connect">Połącz</string>
+	<string name="disconnect">Rozłącz</string>
+	<string name="server_connected_text">połączono z</string>
+	<string name="add">dodaj</string>
+	<string name="wrong_address_format">Niepoprawny format adresu IP</string>
+	<string name="server_connected_ticker">IOMerge: połączono</string>
 </resources>

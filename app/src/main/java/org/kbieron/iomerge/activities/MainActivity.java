@@ -31,29 +31,29 @@ import org.kbieron.iomerge.services.NetworkManager_;
 
 
 @EActivity(R.layout.main_activity)
-public class MainActivity extends Activity implements NavigationView.OnNavigationItemSelectedListener {
+public abstract class MainActivity extends Activity implements NavigationView.OnNavigationItemSelectedListener {
 
 	private final static int REQUEST_CODE = -1010101;
 
 	@ViewById(R.id.toolbar)
-	protected Toolbar toolbar;
+	Toolbar toolbar;
 
 	@ViewById(R.id.drawer_layout)
-	protected DrawerLayout drawer;
+	DrawerLayout drawer;
 
 	@Pref
-	protected Preferences_ prefs;
+	Preferences_ prefs;
 
 	@ViewById(R.id.active_server_address)
-	protected TextView activeServerView;
+	TextView activeServerView;
 
 	@ViewById(R.id.nav_view)
-	protected NavigationView navigationView;
+	NavigationView navigationView;
 
 	@Bean
-	protected InputDevice inputDevice;
+	InputDevice inputDevice;
 
-	protected NetworkManager networkManager;
+	private NetworkManager networkManager;
 
 	private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -84,12 +84,12 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 	}
 
 	@AfterInject
-	protected void bindServices() {
+	void bindServices() {
 		bindService(NetworkManager_.intent(getApplication()).get(), mConnection, BIND_AUTO_CREATE);
 	}
 
 	@AfterViews
-	protected void afterViews() {
+	void afterViews() {
 		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
 			@Override
 			public void onDrawerStateChanged(int newState) {
