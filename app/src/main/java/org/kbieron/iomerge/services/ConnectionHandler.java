@@ -4,22 +4,17 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.util.Log;
 import android.view.KeyEvent;
-
 import com.github.krzychek.server.model.Edge;
+import com.github.krzychek.server.model.MessageProcessorAdapter;
+import com.github.krzychek.server.model.message.misc.ClipboardSync;
+import com.github.krzychek.server.model.message.misc.RemoteExit;
+import com.github.krzychek.server.model.serialization.MessageIOFacade;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
 import org.kbieron.iomerge.views.EdgeTriggerView;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
-import com.github.krzychek.server.model.MessageProcessorAdapter;
-import com.github.krzychek.server.model.message.Message;
-import com.github.krzychek.server.model.message.misc.ClipboardSync;
-import com.github.krzychek.server.model.message.misc.RemoteExit;
 
 
 @EBean(scope = EBean.Scope.Singleton)
@@ -34,21 +29,18 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	@SystemService
 	protected ClipboardManager clipboardManager;
 
-	private ObjectOutputStream serverOutputStream;
-
-	private Socket client;
+	private MessageIOFacade messageIOFacade;
 
 
-	public void startReceiving(Socket client) throws IOException {
-		this.client = client;
-		serverOutputStream = new ObjectOutputStream(client.getOutputStream());
+	public void connect(MessageIOFacade client) throws IOException {
+		messageIOFacade = client;
 		clipboardManager.addPrimaryClipChangedListener(this);
 
-		ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
 		while (true) {
 			try {
-				((Message) objectInputStream.readObject()).process(this);
-			} catch (ClassNotFoundException | ClassCastException e) {
+				messageIOFacade.getMessage().process(this);
+
+			} catch (ClassNotFoundException e) {
 				Log.w("NetworkManager", "problem while receiving msg", e);
 			}
 		}
@@ -65,7 +57,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	}
 
 	@Override
-	public void mouseSync(int x, int y) {
+	public void mouseMove(int x, int y) {
 		inputDevice.mouseMove(x, y);
 	}
 
@@ -120,7 +112,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	public void onPrimaryClipChanged() {
 		String clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString();
 		try {
-			serverOutputStream.writeObject(new ClipboardSync(clipboardText));
+			messageIOFacade.sendMessage(new ClipboardSync(clipboardText));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -128,7 +120,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 
 	public void sendExit() {
 		try {
-			serverOutputStream.writeObject(new RemoteExit());
+			messageIOFacade.sendMessage(new RemoteExit());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -136,14 +128,15 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 
 	public void disconnect() {
 		try {
-			if (client != null) client.close();
-		} catch (IOException ignored) {}
+			if (messageIOFacade != null) messageIOFacade.close();
+		} catch (IOException ignored) {
+		}
 
 		clipboardManager.removePrimaryClipChangedListener(this);
 	}
 
 	public boolean isConnected() {
-		return client != null && client.isConnected();
+		return messageIOFacade != null && !messageIOFacade.isClosed() && !messageIOFacade.isStopped();
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package org.kbieron.iomerge.activities;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -16,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
-
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -74,12 +74,13 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 		super.onStart();
 
 		// FIXME
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getApplicationContext())) {
-			startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())));
-		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getApplicationContext()))
+			checkDrawOverlayPermission();
 	}
 
-	public void checkDrawOverlayPermission() {
+	@TargetApi(Build.VERSION_CODES.M)
+	private void checkDrawOverlayPermission() {
+		startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())));
 	}
 
 	@AfterInject
@@ -95,7 +96,7 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 				if (newState != DrawerLayout.STATE_IDLE) {
 					((TextView) drawer.findViewById(R.id.active_server_address)) //
 							.setText(prefs.serverAddress().get() + ":" + prefs.serverPort().get());
-				}
+					}
 				super.onDrawerStateChanged(newState);
 			}
 		};

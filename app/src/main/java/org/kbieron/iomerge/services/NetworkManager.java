@@ -4,7 +4,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.util.Log;
 import android.view.WindowManager;
-
+import com.github.krzychek.server.model.Edge;
+import com.github.krzychek.server.model.serialization.MessageIOFacade;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
@@ -16,10 +17,6 @@ import org.kbieron.iomerge.notifications.NotificationFactory;
 import org.kbieron.iomerge.views.EdgeTriggerView;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-
-import pl.kbieron.iomerge.model.Edge;
 
 
 @EService
@@ -61,11 +58,8 @@ public class NetworkManager extends Service {
 			try {
 				inputDevice.startNativeDaemon();
 
-				Socket client = new Socket();
-				client.connect(new InetSocketAddress(prefs.serverAddress().get(), prefs.serverPort().get()));
-
 				showEdgeTrigger(connectionHandler);
-				connectionHandler.startReceiving(client);
+				connectionHandler.connect(new MessageIOFacade(prefs.serverAddress().get(), prefs.serverPort().get()));
 
 			} catch (IOException | InterruptedException e) {
 				Log.i("NetworkManager", "disconnected", e);
