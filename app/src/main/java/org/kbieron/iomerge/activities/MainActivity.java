@@ -31,9 +31,7 @@ import org.kbieron.iomerge.services.NetworkManager_;
 
 
 @EActivity(R.layout.main_activity)
-public abstract class MainActivity extends Activity implements NavigationView.OnNavigationItemSelectedListener {
-
-	private final static int REQUEST_CODE = -1010101;
+public class MainActivity extends Activity implements NavigationView.OnNavigationItemSelectedListener {
 
 	@ViewById(R.id.toolbar)
 	Toolbar toolbar;
@@ -100,6 +98,7 @@ public abstract class MainActivity extends Activity implements NavigationView.On
 				super.onDrawerStateChanged(newState);
 			}
 		};
+		//noinspection deprecation
 		drawer.setDrawerListener(toggle);
 		toggle.syncState();
 

@@ -20,7 +20,7 @@ import java.io.IOException;
 
 
 @EService
-public abstract class NetworkManager extends Service {
+public class NetworkManager extends Service {
 
 	@Bean
 	ConnectionHandler connectionHandler;
