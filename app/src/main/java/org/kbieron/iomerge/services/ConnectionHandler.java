@@ -118,7 +118,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 		}
 	}
 
-	public void sendExit() {
+	private void sendExit() {
 		try {
 			messageIOFacade.sendMessage(new RemoteExit());
 		} catch (IOException e) {
@@ -126,7 +126,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 		}
 	}
 
-	public void disconnect() {
+	void disconnect() {
 		try {
 			if (messageIOFacade != null) messageIOFacade.close();
 		} catch (IOException ignored) {
@@ -135,7 +135,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 		clipboardManager.removePrimaryClipChangedListener(this);
 	}
 
-	public boolean isConnected() {
+	boolean isConnected() {
 		return messageIOFacade != null && !messageIOFacade.isClosed() && !messageIOFacade.isStopped();
 	}
 
