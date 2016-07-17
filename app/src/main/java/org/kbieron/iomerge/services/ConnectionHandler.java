@@ -156,7 +156,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 			if (socket != null) socket.close();
 		} catch (IOException ignored) {
 		}
-		heartbeatTimer.shutdownNow();
+		if (heartbeatTimer != null) heartbeatTimer.shutdownNow();
 
 		clipboardManager.removePrimaryClipChangedListener(this);
 	}
