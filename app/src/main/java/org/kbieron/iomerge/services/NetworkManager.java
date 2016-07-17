@@ -66,8 +66,6 @@ public class NetworkManager extends Service {
 
 			} catch (IOException | InterruptedException e) {
 				Log.i("NetworkManager", "disconnected", e);
-			} finally {
-				disconnect();
 			}
 
 		} else {
@@ -95,8 +93,12 @@ public class NetworkManager extends Service {
 
 	public class Binder extends android.os.Binder {
 
-		public NetworkManager getService() {
-			return NetworkManager.this;
+		public void connect() {
+			NetworkManager.this.connect();
+		}
+
+		public void disconnect() {
+			NetworkManager.this.disconnect();
 		}
 	}
 }

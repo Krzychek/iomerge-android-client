@@ -51,14 +51,15 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 	@Bean
 	InputDevice inputDevice;
 
-	private NetworkManager networkManager;
+	private NetworkManager.Binder networkManager;
 
-	private ServiceConnection mConnection = new ServiceConnection() {
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+
 
 		@Override
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			if (service instanceof NetworkManager.Binder) {
-				networkManager = ((NetworkManager.Binder) service).getService();
+		public void onServiceConnected(ComponentName name, IBinder iBinder) {
+			if (iBinder instanceof NetworkManager.Binder) {
+				networkManager = ((NetworkManager.Binder) iBinder);
 			}
 		}
 
@@ -83,7 +84,14 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 
 	@AfterInject
 	void bindServices() {
-		bindService(NetworkManager_.intent(getApplication()).get(), mConnection, BIND_AUTO_CREATE);
+		startService(NetworkManager_.intent(this).get());
+		bindService(NetworkManager_.intent(this).get(), serviceConnection, BIND_AUTO_CREATE);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		unbindService(serviceConnection);
 	}
 
 	@AfterViews
@@ -94,7 +102,7 @@ public class MainActivity extends Activity implements NavigationView.OnNavigatio
 				if (newState != DrawerLayout.STATE_IDLE) {
 					((TextView) drawer.findViewById(R.id.active_server_address)) //
 							.setText(prefs.serverAddress().get() + ":" + prefs.serverPort().get());
-					}
+				}
 				super.onDrawerStateChanged(newState);
 			}
 		};
