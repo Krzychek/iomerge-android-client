@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.WindowManager;
 import com.github.krzychek.server.model.Edge;
-import com.github.krzychek.server.model.serialization.MessageIOFacade;
+import com.github.krzychek.server.model.serialization.MessageSocketWrapper;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
@@ -53,13 +53,16 @@ public abstract class NetworkManager extends Service {
 	@Background
 	public void connect() {
 		if (!connectionHandler.isConnected()) {
-			startForeground(1, notificationFactory.serverConnected(prefs.serverAddress().get(), prefs.serverPort().get()));
+			String address = prefs.serverAddress().get();
+			Integer port = prefs.serverPort().get();
+
+			startForeground(1, notificationFactory.serverConnected(address, port));
 
 			try {
 				inputDevice.startNativeDaemon();
 
 				showEdgeTrigger(connectionHandler);
-				connectionHandler.connect(new MessageIOFacade(prefs.serverAddress().get(), prefs.serverPort().get()));
+				connectionHandler.connect(new MessageSocketWrapper(address, port));
 
 			} catch (IOException | InterruptedException e) {
 				Log.i("NetworkManager", "disconnected", e);

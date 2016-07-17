@@ -9,12 +9,13 @@ import com.github.krzychek.server.model.MessageProcessorAdapter;
 import com.github.krzychek.server.model.message.misc.ClipboardSync;
 import com.github.krzychek.server.model.message.misc.Heartbeat;
 import com.github.krzychek.server.model.message.misc.RemoteExit;
-import com.github.krzychek.server.model.serialization.MessageIOFacade;
+import com.github.krzychek.server.model.serialization.MessageSocketWrapper;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
 import org.kbieron.iomerge.views.EdgeTriggerView;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	@SystemService
 	ClipboardManager clipboardManager;
 
-	private MessageIOFacade messageIOFacade;
+	private MessageSocketWrapper socket;
 	private ScheduledThreadPoolExecutor heartbeatTimer;
 
 	private void startHeartbeatTimer() {
@@ -42,7 +43,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 			@Override
 			public void run() {
 				try {
-					messageIOFacade.sendMessage(message);
+					socket.sendMessage(message);
 				} catch (IOException e) {
 					Log.i("Heartbeattimer", "IOException while sending hearbeat", e);
 					disconnect();
@@ -52,16 +53,19 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	}
 
 
-	void connect(MessageIOFacade client) throws IOException {
-		messageIOFacade = client;
+	void connect(MessageSocketWrapper messageSocketWrapper) {
+		socket = messageSocketWrapper;
 		clipboardManager.addPrimaryClipChangedListener(this);
 		startHeartbeatTimer();
 
-		while (true) {
+		while (!socket.isClosed()) {
 			try {
-				messageIOFacade.getMessage().process(this);
+				socket.getMessage().process(this);
 
-			} catch (ClassNotFoundException e) {
+			} catch (EOFException e) {
+				disconnect();
+
+			} catch (ClassNotFoundException | IOException e) {
 				Log.w("NetworkManager", "problem while receiving msg", e);
 			}
 		}
@@ -133,7 +137,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	public void onPrimaryClipChanged() {
 		String clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString();
 		try {
-			messageIOFacade.sendMessage(new ClipboardSync(clipboardText));
+			socket.sendMessage(new ClipboardSync(clipboardText));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -141,7 +145,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 
 	private void sendExit() {
 		try {
-			messageIOFacade.sendMessage(new RemoteExit());
+			socket.sendMessage(new RemoteExit());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -149,7 +153,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 
 	void disconnect() {
 		try {
-			if (messageIOFacade != null) messageIOFacade.close();
+			if (socket != null) socket.close();
 		} catch (IOException ignored) {
 		}
 		heartbeatTimer.shutdownNow();
@@ -158,7 +162,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	}
 
 	boolean isConnected() {
-		return messageIOFacade != null && !messageIOFacade.isClosed() && !messageIOFacade.isStopped();
+		return socket != null && !socket.isClosed();
 	}
 
 	@Override
