@@ -7,6 +7,7 @@ import android.support.v4.app.NotificationCompat;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.res.StringRes;
+import org.kbieron.iomerge.activities.MainActivity_;
 import org.kbieron.iomerge.android.R;
 import org.kbieron.iomerge.services.NetworkManager;
 import org.kbieron.iomerge.services.NetworkManager_;
@@ -30,18 +31,25 @@ public class NotificationFactory {
 	String connectedTicker;
 
 	public Notification serverConnected(String address, int port) {
-		return new NotificationCompat.Builder(context) //
+		return new NotificationCompat.Builder(context)
+				.setContentIntent(getClickIntent())
 				.setSmallIcon(android.R.drawable.ic_menu_camera)
-				.setContentTitle(appName) //
-				.setContentText(connectedText + address + ":" + port) //
-				.setPriority(PRIORITY_MIN) //
-				.setTicker(connectedTicker) //
+				.setContentTitle(appName)
+				.setContentText(connectedText + address + ":" + port)
+				.setPriority(PRIORITY_MIN)
+				.setTicker(connectedTicker)
 				.addAction(getDisconnectAction())
 				.build();
 	}
 
 	private NotificationCompat.Action getDisconnectAction() {
-		return new NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, "disconnect", PendingIntent.getService
-				(context, 0, NetworkManager_.intent(context).action(NetworkManager.DISCONNECT_ACTION).get(), 0));
+		return new NotificationCompat.Action(
+				android.R.drawable.ic_menu_close_clear_cancel,
+				"disconnect",
+				PendingIntent.getService(context, 0, NetworkManager_.intent(context).action(NetworkManager.DISCONNECT_ACTION).get(), 0));
+	}
+
+	private PendingIntent getClickIntent() {
+		return PendingIntent.getActivity(context, 0, MainActivity_.intent(context).get(), 0);
 	}
 }
