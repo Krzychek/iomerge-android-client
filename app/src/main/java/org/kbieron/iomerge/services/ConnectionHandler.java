@@ -143,9 +143,9 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 		}
 	}
 
-	private void sendExit() {
+	private void sendExit(float v) {
 		try {
-			socket.sendMessage(new RemoteExit());
+			socket.sendMessage(new RemoteExit(v));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -166,7 +166,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	}
 
 	@Override
-	public void onTrig() {
-		sendExit();
+	public void onTrig(float v) {
+		sendExit(v);
 	}
 }

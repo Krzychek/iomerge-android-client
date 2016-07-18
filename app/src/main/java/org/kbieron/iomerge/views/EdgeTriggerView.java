@@ -55,7 +55,7 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 	@Override
 	public boolean onHover(View v, MotionEvent event) {
 		if (MotionEvent.ACTION_HOVER_ENTER == event.getAction()) {
-			trigMe.onTrig();
+			trigMe.onTrig(v.getHeight() / event.getAxisValue(MotionEvent.AXIS_Y));
 		}
 		return false;
 	}
@@ -71,6 +71,6 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 
 	public interface OnTrigListener {
 
-		void onTrig();
+		void onTrig(float v);
 	}
 }
