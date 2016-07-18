@@ -22,6 +22,8 @@ import java.io.IOException;
 @EService
 public class NetworkManager extends Service {
 
+	public static final String DISCONNECT_ACTION = "DISCONNECT";
+
 	@Bean
 	ConnectionHandler connectionHandler;
 
@@ -39,6 +41,14 @@ public class NetworkManager extends Service {
 
 	@Bean
 	EdgeTriggerView edgeTriggerView;
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		if (DISCONNECT_ACTION.equals(intent.getAction()))
+			disconnect();
+
+		return super.onStartCommand(intent, flags, startId);
+	}
 
 	@Override
 	public Binder onBind(Intent intent) {

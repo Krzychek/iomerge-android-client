@@ -1,12 +1,15 @@
 package org.kbieron.iomerge.notifications;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.res.StringRes;
 import org.kbieron.iomerge.android.R;
+import org.kbieron.iomerge.services.NetworkManager;
+import org.kbieron.iomerge.services.NetworkManager_;
 
 import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
 
@@ -33,6 +36,12 @@ public class NotificationFactory {
 				.setContentText(connectedText + address + ":" + port) //
 				.setPriority(PRIORITY_MIN) //
 				.setTicker(connectedTicker) //
+				.addAction(getDisconnectAction())
 				.build();
+	}
+
+	private NotificationCompat.Action getDisconnectAction() {
+		return new NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, "disconnect", PendingIntent.getService
+				(context, 0, NetworkManager_.intent(context).action(NetworkManager.DISCONNECT_ACTION).get(), 0));
 	}
 }
