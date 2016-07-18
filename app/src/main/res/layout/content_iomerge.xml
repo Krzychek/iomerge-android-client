@@ -19,6 +19,6 @@
         android:name="org.kbieron.iomerge.fragments.ServerListFragment_"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/server_list"/>
+        tools:layout="@layout/server_list_fragment_layout"/>
 
 </RelativeLayout>

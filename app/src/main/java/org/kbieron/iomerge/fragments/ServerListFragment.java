@@ -1,13 +1,13 @@
 package org.kbieron.iomerge.fragments;
 
 import android.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
@@ -18,29 +18,28 @@ import org.kbieron.iomerge.android.R;
 import org.kbieron.iomerge.database.ServerBean;
 import org.kbieron.iomerge.database.ServerDAO;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-@EFragment(R.layout.server_list)
-public class ServerListFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+@EFragment(R.layout.server_list_fragment_layout)
+public class ServerListFragment extends Fragment {
 
 	@Pref
-	protected Preferences_ prefs;
+	Preferences_ prefs;
 
 	@ViewById(R.id.server_list_view)
-	protected ListView listView;
+	RecyclerView recyclerView;
 
 	@ViewById(R.id.address)
-	protected TextView addressView;
+	TextView addressView;
 
 	@ViewById(R.id.port)
-	protected TextView portView;
+	TextView portView;
 
 	@Bean
-	protected ServerDAO serverDAO;
-
-	private ArrayAdapter<ServerBean> listAdapter;
+	ServerDAO serverDAO;
 
 	private Pattern addressPattern = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 													 "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -48,9 +47,10 @@ public class ServerListFragment extends Fragment implements AdapterView.OnItemCl
 													 "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
 	private Pattern portPattern = Pattern.compile("^\\d{1,4}$");
+	private ServerListAdapter listAdapter;
 
 	@Click(R.id.addBtn)
-	protected void add() {
+	void add() {
 		Matcher addressMatcher = addressPattern.matcher(addressView.getText().toString());
 		Matcher portMatcher = portPattern.matcher(portView.getText().toString());
 
@@ -60,11 +60,13 @@ public class ServerListFragment extends Fragment implements AdapterView.OnItemCl
 		}
 
 		serverDAO.open();
-		serverDAO.createServer(addressMatcher.group(), Integer.parseInt(portMatcher.group()));
+		ServerBean server = serverDAO.createServer(addressMatcher.group(), Integer.parseInt(portMatcher.group()));
 		serverDAO.close();
+
+		listAdapter.addServer(server);
+
 		addressView.setText("");
 		portView.setText("");
-		refresh();
 	}
 
 	private void showWrongFormatToast() {
@@ -79,32 +81,86 @@ public class ServerListFragment extends Fragment implements AdapterView.OnItemCl
 
 	private void refresh() {
 		serverDAO.open();
-		listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, serverDAO.getAllServers());
-		listView.setOnItemClickListener(this);
-		listView.setOnItemLongClickListener(this);
-		listView.setAdapter(listAdapter);
+		listAdapter = new ServerListAdapter();
+		recyclerView.setAdapter(listAdapter);
+		recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 		serverDAO.close();
-
-
 	}
 
-	@Override
-	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-		ServerBean item = listAdapter.getItem(position);
-		serverDAO.open();
-		serverDAO.deleteServer(item);
-		serverDAO.close();
-		refresh();
-		return true;
-	}
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		ServerBean item = listAdapter.getItem(position);
-		prefs.edit() //
-				.serverAddress().put(item.getAddress()) //
-				.serverPort().put(item.getPort()) //
-				.apply();
-		refresh();
+	private class ServerListAdapter extends RecyclerView.Adapter<ServerListAdapter.ServerViewHolder> {
+
+		private final List<ServerBean> serverBeens;
+
+		private ServerListAdapter() {
+			this.serverBeens = serverDAO.getAllServers();
+		}
+
+		@Override
+		public ServerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+			View view = LayoutInflater.from(parent.getContext())
+					.inflate(R.layout.server_card_layout, parent, false);
+
+			return new ServerViewHolder(view);
+		}
+
+		@Override
+		public void onBindViewHolder(ServerViewHolder holder, int position) {
+			holder.setServer(serverBeens.get(position));
+		}
+
+		@Override
+		public int getItemCount() {
+			return serverBeens.size();
+		}
+
+		void addServer(ServerBean server) {
+			serverBeens.add(server);
+			notifyItemInserted(serverBeens.size() - 1);
+		}
+
+		class ServerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
+			private final TextView address;
+			private final TextView port;
+			private ServerBean server;
+
+			ServerViewHolder(View view) {
+				super(view);
+				address = (TextView) itemView.findViewById(R.id.address);
+				port = (TextView) itemView.findViewById(R.id.port);
+
+				view.setOnClickListener(this);
+				view.setOnLongClickListener(this);
+			}
+
+			private void setServer(ServerBean server) {
+				address.setText(server.getAddress());
+				port.setText(Integer.toString(server.getPort()));
+
+				this.server = server;
+			}
+
+
+			@Override
+			public void onClick(View v) {
+				prefs.edit()
+						.serverAddress().put(server.getAddress())
+						.serverPort().put(server.getPort())
+						.apply();
+			}
+
+			@Override
+			public boolean onLongClick(View v) {
+
+				serverDAO.open();
+				serverDAO.deleteServer(server);
+				serverDAO.close();
+				serverBeens.remove(server);
+				notifyItemRemoved(serverBeens.indexOf(server));
+
+				return false;
+			}
+		}
 	}
 }
