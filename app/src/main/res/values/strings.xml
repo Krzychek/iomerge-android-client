@@ -9,7 +9,11 @@
 
 	<!-- Notification: server connected -->
 	<string name="server_connected_ticker">IOMerge: connected</string>
-	<string name="server_connected_text">connected to</string>
+	<string name="server_connected">connected to</string>
 	<string name="add">add</string>
 	<string name="wrong_address_format">Wrong IP address</string>
+	<string name="default_port" translatable="false">7698</string>
+	<string name="address_label">Address:</string>
+	<string name="port_label">Port:</string>
+	<string name="add_server_dialog_header">Add server</string>
 </resources>

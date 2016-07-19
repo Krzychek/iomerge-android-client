@@ -2,17 +2,14 @@ package org.kbieron.iomerge.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.util.Log;
 import android.view.WindowManager;
-import com.github.krzychek.server.model.Edge;
-import com.github.krzychek.server.model.serialization.MessageSocketWrapper;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
 import org.androidannotations.annotations.SystemService;
-import org.androidannotations.annotations.UiThread;
-import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.kbieron.iomerge.Preferences_;
+import org.kbieron.iomerge.database.ServerBean;
 import org.kbieron.iomerge.notifications.NotificationFactory;
 import org.kbieron.iomerge.views.EdgeTriggerView;
 
@@ -23,6 +20,9 @@ import java.io.IOException;
 public class NetworkManager extends Service {
 
 	public static final String DISCONNECT_ACTION = "DISCONNECT";
+	public static final String CONNECT_ACTION = "CONNECT";
+
+	public static final String SERVER_EXTRA = "SERVER";
 
 	@Bean
 	ConnectionHandler connectionHandler;
@@ -33,9 +33,6 @@ public class NetworkManager extends Service {
 	@Bean
 	NotificationFactory notificationFactory;
 
-	@Pref
-	Preferences_ prefs;
-
 	@SystemService
 	WindowManager windowManager;
 
@@ -44,8 +41,17 @@ public class NetworkManager extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if (DISCONNECT_ACTION.equals(intent.getAction()))
-			disconnect();
+
+		if (intent.getAction() != null) switch (intent.getAction()) {
+			case DISCONNECT_ACTION:
+				disconnect();
+				break;
+			case CONNECT_ACTION:
+				connect((ServerBean) intent.getSerializableExtra(SERVER_EXTRA));
+				break;
+			default:
+				Log.w("NetworkManager", "Uknown intent action: " + intent.getAction());
+		}
 
 		return super.onStartCommand(intent, flags, startId);
 	}
@@ -61,21 +67,18 @@ public class NetworkManager extends Service {
 	}
 
 	@Background
-	public void connect() {
+	void connect(ServerBean server) {
 		if (!connectionHandler.isConnected()) {
-			String address = prefs.serverAddress().get();
-			Integer port = prefs.serverPort().get();
-
-			startForeground(1, notificationFactory.serverConnected(address, port));
 
 			try {
-				inputDevice.startNativeDaemon();
-
-				showEdgeTrigger(connectionHandler);
-				connectionHandler.connect(new MessageSocketWrapper(address, port));
+				// connect
+				connectionHandler.connect(server);
+				// show notification
+				startForeground(1, notificationFactory.serverConnected(server));
 
 			} catch (IOException | InterruptedException e) {
 				Log.i("NetworkManager", "disconnected", e);
+				connectionHandler.disconnect();
 			}
 
 		} else {
@@ -83,11 +86,6 @@ public class NetworkManager extends Service {
 		}
 	}
 
-	@UiThread
-	protected void showEdgeTrigger(EdgeTriggerView.OnTrigListener onTrigListener) {
-		edgeTriggerView.setOnTrigListener(onTrigListener);
-		edgeTriggerView.showOrMove(Edge.LEFT);
-	}
 
 	@Background
 	public void disconnect() {
@@ -98,17 +96,5 @@ public class NetworkManager extends Service {
 		connectionHandler.disconnect();
 		inputDevice.stop();
 		stopForeground(true);
-	}
-
-
-	public class Binder extends android.os.Binder {
-
-		public void connect() {
-			NetworkManager.this.connect();
-		}
-
-		public void disconnect() {
-			NetworkManager.this.disconnect();
-		}
 	}
 }

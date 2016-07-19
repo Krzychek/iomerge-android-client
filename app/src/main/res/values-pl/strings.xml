@@ -4,8 +4,11 @@
 
 	<string name="connect">Połącz</string>
 	<string name="disconnect">Rozłącz</string>
-	<string name="server_connected_text">połączono z</string>
+	<string name="server_connected">połączono z</string>
 	<string name="add">dodaj</string>
 	<string name="wrong_address_format">Niepoprawny format adresu IP</string>
 	<string name="server_connected_ticker">IOMerge: połączono</string>
+	<string name="address_label">Adres:</string>
+	<string name="port_label">Port:</string>
+	<string name="add_server_dialog_header">dodaj server</string>
 </resources>

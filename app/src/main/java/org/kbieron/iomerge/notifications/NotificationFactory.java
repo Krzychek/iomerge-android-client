@@ -9,6 +9,7 @@ import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.res.StringRes;
 import org.kbieron.iomerge.activities.MainActivity_;
 import org.kbieron.iomerge.android.R;
+import org.kbieron.iomerge.database.ServerBean;
 import org.kbieron.iomerge.services.NetworkManager;
 import org.kbieron.iomerge.services.NetworkManager_;
 
@@ -21,7 +22,7 @@ public class NotificationFactory {
 	@RootContext
 	Context context;
 
-	@StringRes(R.string.server_connected_text)
+	@StringRes(R.string.server_connected)
 	String connectedText;
 
 	@StringRes(R.string.app_name)
@@ -30,12 +31,12 @@ public class NotificationFactory {
 	@StringRes(R.string.server_connected_ticker)
 	String connectedTicker;
 
-	public Notification serverConnected(String address, int port) {
+	public Notification serverConnected(ServerBean server) {
 		return new NotificationCompat.Builder(context)
 				.setContentIntent(getClickIntent())
 				.setSmallIcon(android.R.drawable.ic_menu_camera)
 				.setContentTitle(appName)
-				.setContentText(connectedText + address + ":" + port)
+				.setContentText(connectedText + server.getAddress() + ":" + server.getPort())
 				.setPriority(PRIORITY_MIN)
 				.setTicker(connectedTicker)
 				.addAction(getDisconnectAction())

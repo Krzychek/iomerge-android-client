@@ -7,9 +7,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import com.github.krzychek.server.model.Edge;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
 import org.androidannotations.annotations.UiThread;
+import org.kbieron.iomerge.services.ConnectionHandler;
 
 
 @EBean(scope = EBean.Scope.Singleton)
@@ -18,7 +20,8 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 	@SystemService
 	WindowManager windowManager;
 
-	private OnTrigListener trigMe;
+	@Bean
+	ConnectionHandler connectionHandler;
 
 	private WindowManager.LayoutParams windowLayoutParams;
 
@@ -55,7 +58,7 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 	@Override
 	public boolean onHover(View v, MotionEvent event) {
 		if (MotionEvent.ACTION_HOVER_ENTER == event.getAction()) {
-			trigMe.onTrig(v.getHeight() / event.getAxisValue(MotionEvent.AXIS_Y));
+			connectionHandler.sendExit(v.getHeight() / event.getAxisValue(MotionEvent.AXIS_Y));
 		}
 		return false;
 	}
@@ -63,14 +66,5 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		setMeasuredDimension(1, heightMeasureSpec);
-	}
-
-	public void setOnTrigListener(OnTrigListener trigMe) {
-		this.trigMe = trigMe;
-	}
-
-	public interface OnTrigListener {
-
-		void onTrig(float v);
 	}
 }

@@ -13,6 +13,7 @@ import com.github.krzychek.server.model.serialization.MessageSocketWrapper;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
+import org.kbieron.iomerge.database.ServerBean;
 import org.kbieron.iomerge.views.EdgeTriggerView;
 
 import java.io.EOFException;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @EBean(scope = EBean.Scope.Singleton)
-class ConnectionHandler extends MessageProcessorAdapter implements ClipboardManager.OnPrimaryClipChangedListener, EdgeTriggerView.OnTrigListener {
+public class ConnectionHandler extends MessageProcessorAdapter implements ClipboardManager.OnPrimaryClipChangedListener {
 
 	@Bean
 	InputDevice inputDevice;
@@ -53,22 +54,32 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 	}
 
 
-	void connect(MessageSocketWrapper messageSocketWrapper) {
-		socket = messageSocketWrapper;
+	void connect(ServerBean server) throws IOException, InterruptedException {
+		socket = new MessageSocketWrapper(server.getAddress(), server.getPort());
 		clipboardManager.addPrimaryClipChangedListener(this);
 		startHeartbeatTimer();
 
-		while (!socket.isClosed()) {
-			try {
-				socket.getMessage().process(this);
+		// start daemon
+		inputDevice.startNativeDaemon();
 
-			} catch (EOFException e) {
-				disconnect();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
 
-			} catch (ClassNotFoundException | IOException e) {
-				Log.w("NetworkManager", "problem while receiving msg", e);
+				while (!socket.isClosed()) {
+					try {
+						socket.getMessage().process(ConnectionHandler.this);
+
+					} catch (EOFException e) {
+						disconnect();
+
+					} catch (ClassNotFoundException | IOException e) {
+						Log.w("NetworkManager", "problem while receiving msg", e);
+					}
+				}
+
 			}
-		}
+		}).start();
 	}
 
 	@Override
@@ -143,7 +154,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 		}
 	}
 
-	private void sendExit(float v) {
+	public void sendExit(float v) {
 		try {
 			socket.sendMessage(new RemoteExit(v));
 		} catch (IOException e) {
@@ -156,6 +167,7 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 			if (socket != null) socket.close();
 		} catch (IOException ignored) {
 		}
+		inputDevice.stop();
 		if (heartbeatTimer != null) heartbeatTimer.shutdownNow();
 
 		clipboardManager.removePrimaryClipChangedListener(this);
@@ -163,10 +175,5 @@ class ConnectionHandler extends MessageProcessorAdapter implements ClipboardMana
 
 	boolean isConnected() {
 		return socket != null && !socket.isClosed();
-	}
-
-	@Override
-	public void onTrig(float v) {
-		sendExit(v);
 	}
 }

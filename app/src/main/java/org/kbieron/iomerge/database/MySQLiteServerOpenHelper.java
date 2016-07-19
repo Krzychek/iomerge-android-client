@@ -3,20 +3,20 @@ package org.kbieron.iomerge.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
 import org.androidannotations.annotations.EBean;
 
+import java.util.Arrays;
+import java.util.List;
 
-@EBean
+
+@EBean(scope = EBean.Scope.Singleton)
 public class MySQLiteServerOpenHelper extends SQLiteOpenHelper {
 
-	public static final String TABLE = "servers";
-
-	public static final String ID_COL = "_id";
-
-	public static final String ADDRESS_COL = "address";
-
-	public static final String PORT_COL = "port";
+	static final String TABLE = "servers";
+	static final String ID_COL = "_id";
+	static final String ADDRESS_COL = "address";
+	static final String PORT_COL = "port";
+	static final List<String> COLUMNS = Arrays.asList(ID_COL, ADDRESS_COL, PORT_COL);
 
 	private static final String DATABASE_NAME = "servers.db";
 
@@ -30,7 +30,7 @@ public class MySQLiteServerOpenHelper extends SQLiteOpenHelper {
 												  + "UNIQUE (" + ADDRESS_COL + "," + PORT_COL + ")"
 												  + "ON CONFLICT REPLACE);";
 
-	public MySQLiteServerOpenHelper(Context context) {
+	MySQLiteServerOpenHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
@@ -44,6 +44,5 @@ public class MySQLiteServerOpenHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE);
 		onCreate(db);
 	}
-
 
 }
