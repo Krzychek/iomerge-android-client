@@ -1,35 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="org.kbieron.iomerge.android"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+		package="org.kbieron.iomerge.android"
+		xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- server connection -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- edge trigger -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+	<!-- server connection -->
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<!-- edge trigger -->
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
-    <application
-        android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/Base.Theme.AppCompat.Light">
-        <activity
-            android:name="org.kbieron.iomerge.activities.MainActivity_"
-            android:label="@string/app_name"
-            android:theme="@style/Base.Theme.AppCompat.Light">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+	<application
+			android:name="org.kbieron.iomerge.IOMerge"
+			android:allowBackup="false"
+			android:icon="@mipmap/ic_launcher"
+			android:label="@string/app_name"
+			android:supportsRtl="true"
+			android:theme="@style/Base.Theme.AppCompat.Light">
+		<activity
+				android:name="org.kbieron.iomerge.activities.MainActivity_"
+				android:label="@string/app_name"
+				android:theme="@style/Base.Theme.AppCompat.Light">
 
-        <service
-            android:name="org.kbieron.iomerge.services.NetworkManager_"
-            android:enabled="true"
-            android:exported="false"/>
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"/>
+				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
+		</activity>
+
+		<service
+				android:name="org.kbieron.iomerge.services.NetworkManager_"
+				android:enabled="true"
+				android:exported="false"/>
 
 
-    </application>
+	</application>
 
 </manifest>
