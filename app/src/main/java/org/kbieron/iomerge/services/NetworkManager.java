@@ -13,8 +13,6 @@ import org.kbieron.iomerge.database.ServerBean;
 import org.kbieron.iomerge.notifications.NotificationFactory;
 import org.kbieron.iomerge.views.EdgeTriggerView;
 
-import java.io.IOException;
-
 
 @EService
 public class NetworkManager extends Service {
@@ -76,7 +74,7 @@ public class NetworkManager extends Service {
 				// show notification
 				startForeground(1, notificationFactory.serverConnected(server));
 
-			} catch (IOException | InterruptedException e) {
+			} catch (InterruptedException e) {
 				Log.i("NetworkManager", "disconnected", e);
 				disconnect();
 			}

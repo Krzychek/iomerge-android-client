@@ -54,13 +54,19 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 	}
 
 
-	void connect(ServerBean server, final NetworkManager networkManager) throws IOException, InterruptedException {
-		socket = new MessageSocketWrapper(server.getAddress(), server.getPort());
-		clipboardManager.addPrimaryClipChangedListener(this);
-		startHeartbeatTimer(networkManager);
+	void connect(ServerBean server, final NetworkManager networkManager) throws InterruptedException {
+		try {
+			socket = new MessageSocketWrapper(server.getAddress(), server.getPort());
 
-		// start daemon
-		inputDevice.startNativeDaemon();
+			clipboardManager.addPrimaryClipChangedListener(this);
+			startHeartbeatTimer(networkManager);
+
+			// start daemon
+			inputDevice.startNativeDaemon();
+
+		} catch (IOException e) {
+			disconnect(networkManager);
+		}
 
 		new Thread(new Runnable() {
 			@Override
