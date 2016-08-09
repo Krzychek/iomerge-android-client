@@ -9,8 +9,9 @@
 int getButton(jint button) {
     switch (button) {
         case 1: return BTN_LEFT;
-        case 2: return BTN_RIGHT;
-        case 3: return BTN_LEFT;
+        case 2: return BTN_MIDDLE;
+        case 3: return BTN_RIGHT;
+        default: return BTN_LEFT;
     }
 }
 
