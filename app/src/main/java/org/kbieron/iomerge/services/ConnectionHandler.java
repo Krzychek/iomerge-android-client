@@ -54,7 +54,7 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 	}
 
 
-	void connect(ServerBean server, final NetworkManager networkManager) throws InterruptedException {
+	void connect(ServerBean server, final NetworkManager networkManager) {
 		try {
 			socket = new MessageSocketWrapper(server.getAddress(), server.getPort());
 
@@ -64,28 +64,29 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 			// start daemon
 			inputDevice.startNativeDaemon();
 
-		} catch (IOException e) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+
+					while (isConnected()) {
+						try {
+							socket.getMessage().process(ConnectionHandler.this);
+
+						} catch (EOFException e) {
+							disconnect(networkManager);
+
+						} catch (ClassNotFoundException | IOException e) {
+							Log.w("NetworkManager", "problem while receiving msg", e);
+						}
+					}
+
+				}
+			}).start();
+
+		} catch (IOException | InterruptedException e) {
+			Log.e("ConnectionHandler", "problem with connection", e);
 			disconnect(networkManager);
 		}
-
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-
-				while (!socket.isClosed()) {
-					try {
-						socket.getMessage().process(ConnectionHandler.this);
-
-					} catch (EOFException e) {
-						disconnect(networkManager);
-
-					} catch (ClassNotFoundException | IOException e) {
-						Log.w("NetworkManager", "problem while receiving msg", e);
-					}
-				}
-
-			}
-		}).start();
 	}
 
 	@Override
@@ -173,6 +174,8 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 			if (socket != null) socket.close();
 		} catch (IOException ignored) {
 		}
+		socket = null;
+
 		if (heartbeatTimer != null) heartbeatTimer.shutdownNow();
 		clipboardManager.removePrimaryClipChangedListener(this);
 		networkManager.disconnect();

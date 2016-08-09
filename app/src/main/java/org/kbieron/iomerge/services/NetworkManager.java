@@ -40,7 +40,7 @@ public class NetworkManager extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
-		if (intent.getAction() != null) switch (intent.getAction()) {
+		if (intent != null && intent.getAction() != null) switch (intent.getAction()) {
 			case DISCONNECT_ACTION:
 				disconnect();
 				break;
@@ -68,16 +68,10 @@ public class NetworkManager extends Service {
 	void connect(ServerBean server) {
 		if (!connectionHandler.isConnected()) {
 
-			try {
-				// connect
-				connectionHandler.connect(server, this);
-				// show notification
-				startForeground(1, notificationFactory.serverConnected(server));
-
-			} catch (InterruptedException e) {
-				Log.i("NetworkManager", "disconnected", e);
-				disconnect();
-			}
+			// connect
+			connectionHandler.connect(server, this);
+			// show notification
+			startForeground(1, notificationFactory.serverConnected(server));
 
 		} else {
 			Log.i("NetworkManager", "already connected");
