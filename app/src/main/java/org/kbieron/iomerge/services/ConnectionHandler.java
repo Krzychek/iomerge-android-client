@@ -90,13 +90,13 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 	}
 
 	@Override
-	public void mousePress() {
-		inputDevice.mousePress();
+	public void mousePress(int button) {
+		inputDevice.mousePress(button);
 	}
 
 	@Override
-	public void mouseRelease() {
-		inputDevice.mouseRelease();
+	public void mouseRelease(int button) {
+		inputDevice.mouseRelease(button);
 	}
 
 	@Override

@@ -58,9 +58,9 @@ public class InputDevice {
 
 	native void mouseMove(int x, int y);
 
-	native void mousePress();
+	native void mousePress(int button);
 
-	native void mouseRelease();
+	native void mouseRelease(int button);
 
 	native void keyPress(int c);
 

@@ -5,6 +5,15 @@
 #include <sys/stat.h>
 
 
+/*--------------- mouse button map ----------------*/
+int getButton(jint button) {
+    switch (button) {
+        case 1: return BTN_LEFT;
+        case 2: return BTN_RIGHT;
+        case 3: return BTN_LEFT;
+    }
+}
+
 /*--------------- key map ----------------*/ // TODO fill whole map
 int getEventCode(int keyCode) {
     switch (keyCode) {
@@ -154,24 +163,24 @@ Java_org_kbieron_iomerge_services_InputDevice_mouseMove(JNIEnv* env, jobject ins
 }
 
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_services_InputDevice_mousePress(JNIEnv* env, jobject instance) {
+Java_org_kbieron_iomerge_services_InputDevice_mousePress(JNIEnv* env, jobject instance, jint button) {
     struct my_event event;
     memset(&event, 0, sizeof(struct my_event));
 
     event.type = EV_KEY;
-    event.code = BTN_LEFT;
+    event.code = getButton(button);
     event.value = 1;
 
     send_event(&event, 1);
 }
 
 JNIEXPORT void JNICALL
-Java_org_kbieron_iomerge_services_InputDevice_mouseRelease(JNIEnv* env, jobject instance) {
+Java_org_kbieron_iomerge_services_InputDevice_mouseRelease(JNIEnv* env, jobject instance, jint button) {
     struct my_event event;
     memset(&event, 0, sizeof(struct my_event));
 
     event.type = EV_KEY;
-    event.code = BTN_LEFT;
+    event.code = getButton(button);
     event.value = 0;
 
     send_event(&event, 1);
