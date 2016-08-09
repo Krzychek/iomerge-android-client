@@ -6,7 +6,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import com.github.krzychek.server.model.Edge;
+import com.github.krzychek.iomerge.server.model.Edge;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
@@ -53,6 +53,12 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 		} else {
 			windowManager.addView(this, windowLayoutParams);
 		}
+	}
+
+	@UiThread
+	public void hide() {
+		if (isAttachedToWindow())
+			windowManager.removeView(this);
 	}
 
 	@Override

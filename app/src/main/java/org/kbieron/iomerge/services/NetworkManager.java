@@ -72,13 +72,13 @@ public class NetworkManager extends Service {
 
 			try {
 				// connect
-				connectionHandler.connect(server);
+				connectionHandler.connect(server, this);
 				// show notification
 				startForeground(1, notificationFactory.serverConnected(server));
 
 			} catch (IOException | InterruptedException e) {
 				Log.i("NetworkManager", "disconnected", e);
-				connectionHandler.disconnect();
+				disconnect();
 			}
 
 		} else {
@@ -90,10 +90,7 @@ public class NetworkManager extends Service {
 	@Background
 	public void disconnect() {
 		Log.i("NetworkManager", "Disconnecting");
-		if (edgeTriggerView.isAttachedToWindow()) {
-			windowManager.removeView(edgeTriggerView);
-		}
-		connectionHandler.disconnect();
+		edgeTriggerView.hide();
 		inputDevice.stop();
 		stopForeground(true);
 	}

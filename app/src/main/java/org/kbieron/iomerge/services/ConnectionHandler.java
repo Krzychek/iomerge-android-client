@@ -4,12 +4,12 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.util.Log;
 import android.view.KeyEvent;
-import com.github.krzychek.server.model.Edge;
-import com.github.krzychek.server.model.MessageProcessorAdapter;
-import com.github.krzychek.server.model.message.misc.ClipboardSync;
-import com.github.krzychek.server.model.message.misc.Heartbeat;
-import com.github.krzychek.server.model.message.misc.RemoteExit;
-import com.github.krzychek.server.model.serialization.MessageSocketWrapper;
+import com.github.krzychek.iomerge.server.model.Edge;
+import com.github.krzychek.iomerge.server.model.MessageProcessorAdapter;
+import com.github.krzychek.iomerge.server.model.message.misc.ClipboardSync;
+import com.github.krzychek.iomerge.server.model.message.misc.Heartbeat;
+import com.github.krzychek.iomerge.server.model.message.misc.RemoteExit;
+import com.github.krzychek.iomerge.server.model.serialization.MessageSocketWrapper;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
@@ -37,7 +37,7 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 	private MessageSocketWrapper socket;
 	private ScheduledThreadPoolExecutor heartbeatTimer;
 
-	private void startHeartbeatTimer() {
+	private void startHeartbeatTimer(final NetworkManager networkManager) {
 		final Heartbeat message = new Heartbeat();
 		heartbeatTimer = new ScheduledThreadPoolExecutor(1);
 		heartbeatTimer.scheduleWithFixedDelay(new Runnable() {
@@ -47,17 +47,17 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 					socket.sendMessage(message);
 				} catch (IOException e) {
 					Log.i("Heartbeattimer", "IOException while sending hearbeat", e);
-					disconnect();
+					disconnect(networkManager);
 				}
 			}
 		}, 2, 2, TimeUnit.SECONDS);
 	}
 
 
-	void connect(ServerBean server) throws IOException, InterruptedException {
+	void connect(ServerBean server, final NetworkManager networkManager) throws IOException, InterruptedException {
 		socket = new MessageSocketWrapper(server.getAddress(), server.getPort());
 		clipboardManager.addPrimaryClipChangedListener(this);
-		startHeartbeatTimer();
+		startHeartbeatTimer(networkManager);
 
 		// start daemon
 		inputDevice.startNativeDaemon();
@@ -71,7 +71,7 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 						socket.getMessage().process(ConnectionHandler.this);
 
 					} catch (EOFException e) {
-						disconnect();
+						disconnect(networkManager);
 
 					} catch (ClassNotFoundException | IOException e) {
 						Log.w("NetworkManager", "problem while receiving msg", e);
@@ -162,15 +162,14 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 		}
 	}
 
-	void disconnect() {
+	void disconnect(NetworkManager networkManager) {
 		try {
 			if (socket != null) socket.close();
 		} catch (IOException ignored) {
 		}
-		inputDevice.stop();
 		if (heartbeatTimer != null) heartbeatTimer.shutdownNow();
-
 		clipboardManager.removePrimaryClipChangedListener(this);
+		networkManager.disconnect();
 	}
 
 	boolean isConnected() {
