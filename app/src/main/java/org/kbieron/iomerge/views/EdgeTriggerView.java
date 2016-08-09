@@ -29,11 +29,11 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 		super(context);
 		setOnHoverListener(this);
 
-		windowLayoutParams = new WindowManager.LayoutParams( //
-				WindowManager.LayoutParams.WRAP_CONTENT, //
-				WindowManager.LayoutParams.WRAP_CONTENT, //
-				WindowManager.LayoutParams.TYPE_PRIORITY_PHONE, //
-				WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, //
+		windowLayoutParams = new WindowManager.LayoutParams(
+				WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
+				WindowManager.LayoutParams.TYPE_SYSTEM_ERROR, // needed to display over lockscreen
+				WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+				| WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN, // show above system elements, e.g. status bar
 				PixelFormat.TRANSPARENT);
 	}
 
