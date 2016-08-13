@@ -1,11 +1,11 @@
 buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-    }
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.android.tools.build:gradle:2.1.0'
+		classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+	}
 }
 
 apply plugin: 'com.android.application'
@@ -13,35 +13,51 @@ apply plugin: 'android-apt'
 
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
-    defaultConfig {
-        applicationId "org.kbieron.iomerge"
-        minSdkVersion 19
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    lintOptions {
-        disable 'InvalidPackage'
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
+	compileSdkVersion 23
+	buildToolsVersion "23.0.2"
+	defaultConfig {
+		applicationId "org.kbieron.iomerge"
+		minSdkVersion 19
+		targetSdkVersion 23
+		versionCode 1
+		versionName "1.0"
+	}
+	/**
+	 * $GRADLE_HOME/gradle.properties:
+	 *                                 RELEASE_STORE_FILE=/path/to/keystore.jks
+	 *                                 RELEASE_STORE_PASSWORD=*
+	 *                                 RELEASE_KEY_ALIAS=*
+	 *                                 RELEASE_KEY_PASSWORD=*
+	 */
+	signingConfigs {
+		release {
+			storeFile file(RELEASE_STORE_FILE)
+			storePassword RELEASE_STORE_PASSWORD
+			keyAlias RELEASE_KEY_ALIAS
+			keyPassword RELEASE_KEY_PASSWORD
+		}
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled true
+			zipAlignEnabled true
+			signingConfig signingConfigs.release
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+		}
+	}
+
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_7
+		targetCompatibility JavaVersion.VERSION_1_7
+	}
 }
 
 apt {
-    arguments {
-        androidManifestFile variant.outputs[0]?.processResources?.manifestFile
-        resourcePackageName android.defaultConfig.applicationId + ".android"
-    }
+	arguments {
+		androidManifestFile variant.outputs[0]?.processResources?.manifestFile
+		resourcePackageName android.defaultConfig.applicationId + ".android"
+	}
 }
 
 dependencies {
@@ -49,14 +65,14 @@ dependencies {
 
 	compile 'com.github.Krzychek.iomerge-server:data-model:master-SNAPSHOT'
 	apt "org.androidannotations:androidannotations:4.0.0"
-	compile 'org.androidannotations:androidannotations-api:4.0.+'
+	compile 'org.androidannotations:androidannotations-api:4.0.0'
 
 	compile 'com.android.support:appcompat-v7:23.4.+'
 	compile 'com.android.support:design:23.4.+'
 	compile 'com.android.support:cardview-v7:23.4.+'
 	compile 'com.android.support:support-v4:23.4.+'
 
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+	debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+	releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+	testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
 }
