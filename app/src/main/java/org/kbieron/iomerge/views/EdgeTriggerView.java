@@ -2,6 +2,7 @@ package org.kbieron.iomerge.views;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,12 +18,14 @@ import org.kbieron.iomerge.services.ConnectionHandler;
 @EBean(scope = EBean.Scope.Singleton)
 public class EdgeTriggerView extends View implements View.OnHoverListener {
 
+	private final int THICKNESS = 1;
+
 	@SystemService
 	WindowManager windowManager;
-
 	@Bean
 	ConnectionHandler connectionHandler;
 
+	private Edge edge = Edge.LEFT;
 	private WindowManager.LayoutParams windowLayoutParams;
 
 	public EdgeTriggerView(Context context) {
@@ -41,12 +44,22 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 	public void showOrMove(Edge edge) {
 		switch (edge) {
 			case LEFT:
-				windowLayoutParams.gravity = Gravity.TOP | Gravity.RIGHT;
+				windowLayoutParams.gravity = Gravity.FILL_VERTICAL | Gravity.RIGHT;
+				break;
+			case RIGHT:
+				windowLayoutParams.gravity = Gravity.FILL_VERTICAL | Gravity.LEFT;
+				break;
+			case TOP:
+				windowLayoutParams.gravity = Gravity.FILL_HORIZONTAL | Gravity.BOTTOM;
+				break;
+			case BOTTOM:
+				windowLayoutParams.gravity = Gravity.FILL_HORIZONTAL | Gravity.TOP;
 				break;
 			default:
-			case RIGHT:
-				windowLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
+				Log.e("EdgeTriggerView", "Unknown Edge:" + edge);
+				return;
 		}
+		this.edge = edge;
 
 		if (getWindowToken() != null) {
 			windowManager.updateViewLayout(this, windowLayoutParams);
@@ -71,6 +84,15 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		setMeasuredDimension(1, heightMeasureSpec);
+		switch (edge) {
+			case RIGHT:
+			case LEFT:
+				setMeasuredDimension(THICKNESS, heightMeasureSpec);
+				break;
+			case TOP:
+			case BOTTOM:
+				setMeasuredDimension(widthMeasureSpec, THICKNESS);
+				break;
+		}
 	}
 }
