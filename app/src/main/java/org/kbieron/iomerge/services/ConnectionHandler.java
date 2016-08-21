@@ -70,7 +70,7 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 
 					while (isConnected()) {
 						try {
-							socket.getMessage().process(ConnectionHandler.this);
+							socket.readMessage().process(ConnectionHandler.this);
 
 						} catch (EOFException e) {
 							disconnect(networkManager);
@@ -169,7 +169,7 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 		}
 	}
 
-	void disconnect(NetworkManager networkManager) {
+	private void disconnect(NetworkManager networkManager) {
 		try {
 			if (socket != null) socket.close();
 		} catch (IOException ignored) {
