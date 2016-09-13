@@ -8,12 +8,13 @@ import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.res.StringRes;
 import org.kbieron.iomerge.activities.MainActivity_;
+import org.kbieron.iomerge.activities.RemoteContolActivity_;
 import org.kbieron.iomerge.android.R;
 import org.kbieron.iomerge.database.ServerBean;
 import org.kbieron.iomerge.services.NetworkManager;
 import org.kbieron.iomerge.services.NetworkManager_;
 
-import static android.support.v4.app.NotificationCompat.PRIORITY_MIN;
+import static android.support.v4.app.NotificationCompat.PRIORITY_LOW;
 
 
 @EBean(scope = EBean.Scope.Singleton)
@@ -37,9 +38,10 @@ public class NotificationFactory {
 				.setSmallIcon(android.R.drawable.ic_menu_camera)
 				.setContentTitle(appName)
 				.setContentText(connectedText + server.getAddress() + ":" + server.getPort())
-				.setPriority(PRIORITY_MIN)
+				.setPriority(PRIORITY_LOW)
 				.setTicker(connectedTicker)
 				.addAction(getDisconnectAction())
+				.addAction(getRemoteControlAction())
 				.build();
 	}
 
@@ -52,5 +54,12 @@ public class NotificationFactory {
 
 	private PendingIntent getClickIntent() {
 		return PendingIntent.getActivity(context, 0, MainActivity_.intent(context).get(), 0);
+	}
+
+	private NotificationCompat.Action getRemoteControlAction() {
+		return new NotificationCompat.Action(
+				android.R.drawable.ic_media_play,
+				"remote control",
+				PendingIntent.getActivity(context, 0, RemoteContolActivity_.intent(context).get(), 0));
 	}
 }

@@ -9,6 +9,11 @@ import com.github.krzychek.iomerge.server.model.MessageProcessorAdapter;
 import com.github.krzychek.iomerge.server.model.message.misc.ClipboardSync;
 import com.github.krzychek.iomerge.server.model.message.misc.Heartbeat;
 import com.github.krzychek.iomerge.server.model.message.misc.RemoteExit;
+import com.github.krzychek.iomerge.server.model.message.mouse.MouseButton;
+import com.github.krzychek.iomerge.server.model.message.mouse.MouseMove;
+import com.github.krzychek.iomerge.server.model.message.mouse.MousePress;
+import com.github.krzychek.iomerge.server.model.message.mouse.MouseRelease;
+import com.github.krzychek.iomerge.server.model.message.mouse.MouseWheel;
 import com.github.krzychek.iomerge.server.model.serialization.MessageSocketWrapper;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
@@ -90,13 +95,17 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 	}
 
 	@Override
-	public void mousePress(int button) {
-		inputDevice.mousePress(button);
+	public void mousePress(MouseButton button) {
+		inputDevice.mousePress(getButton(button));
+	}
+
+	private int getButton(MouseButton button) {
+		return 0;
 	}
 
 	@Override
-	public void mouseRelease(int button) {
-		inputDevice.mouseRelease(button);
+	public void mouseRelease(MouseButton button) {
+		inputDevice.mouseRelease(getButton(button));
 	}
 
 	@Override
@@ -164,6 +173,39 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 	public void sendExit(float v) {
 		try {
 			socket.sendMessage(new RemoteExit(v));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendMouseMove(int x, int y) {
+		try {
+			socket.sendMessage(new MouseMove(x, y));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendMousePress(MouseButton button) {
+		try {
+			socket.sendMessage(new MousePress(button));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void sendMouseRelease(MouseButton button) {
+		try {
+			socket.sendMessage(new MouseRelease(button));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	public void sendMouseWheel(int dx) {
+		try {
+			socket.sendMessage(new MouseWheel(dx));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

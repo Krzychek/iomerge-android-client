@@ -33,7 +33,7 @@ public class AddServerDialogFragment extends DialogFragment {
 
 	private class PositiveButtonListener implements DialogInterface.OnClickListener {
 
-		private static final String IP_PART_PATTERN = "(\\d?[1-9]|1\\d\\d|2[0-4]\\d|25[0-5])";
+		private static final String IP_PART_PATTERN = "(\\d?[1-9]|1\\d\\d|2[0-4]\\d|25[0-5]|0)";
 		private static final String ADDRESS_PATTERN =
 				"^" + IP_PART_PATTERN + "\\." + IP_PART_PATTERN + "\\." + IP_PART_PATTERN + "\\." + IP_PART_PATTERN + "$";
 		private static final String PORT_PATTERN = "^\\d{4}$";
