@@ -37,7 +37,7 @@ public class NotificationFactory {
 				.setContentIntent(getClickIntent())
 				.setSmallIcon(android.R.drawable.ic_menu_camera)
 				.setContentTitle(appName)
-				.setContentText(connectedText + server.getAddress() + ":" + server.getPort())
+				.setContentText(connectedText + " " + server.getAddress() + ":" + server.getPort())
 				.setPriority(PRIORITY_LOW)
 				.setTicker(connectedTicker)
 				.addAction(getDisconnectAction())
