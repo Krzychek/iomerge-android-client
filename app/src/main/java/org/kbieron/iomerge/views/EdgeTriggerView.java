@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import com.github.krzychek.iomerge.server.model.Edge;
+import com.github.krzychek.iomerge.server.model.message.misc.RemoteExit;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.SystemService;
@@ -77,7 +78,7 @@ public class EdgeTriggerView extends View implements View.OnHoverListener {
 	@Override
 	public boolean onHover(View v, MotionEvent event) {
 		if (MotionEvent.ACTION_HOVER_ENTER == event.getAction()) {
-			connectionHandler.sendExit(v.getHeight() / event.getAxisValue(MotionEvent.AXIS_Y));
+			connectionHandler.sendMessage(new RemoteExit(v.getHeight() / event.getAxisValue(MotionEvent.AXIS_Y)));
 		}
 		return false;
 	}

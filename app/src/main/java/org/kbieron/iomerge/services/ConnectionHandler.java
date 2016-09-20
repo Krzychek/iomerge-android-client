@@ -5,15 +5,12 @@ import android.content.ClipboardManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import com.github.krzychek.iomerge.server.model.Edge;
-import com.github.krzychek.iomerge.server.model.MessageProcessorAdapter;
+import com.github.krzychek.iomerge.server.model.MouseButton;
+import com.github.krzychek.iomerge.server.model.SpecialKey;
+import com.github.krzychek.iomerge.server.model.message.Message;
 import com.github.krzychek.iomerge.server.model.message.misc.ClipboardSync;
 import com.github.krzychek.iomerge.server.model.message.misc.Heartbeat;
-import com.github.krzychek.iomerge.server.model.message.misc.RemoteExit;
-import com.github.krzychek.iomerge.server.model.message.mouse.MouseButton;
-import com.github.krzychek.iomerge.server.model.message.mouse.MouseMove;
-import com.github.krzychek.iomerge.server.model.message.mouse.MousePress;
-import com.github.krzychek.iomerge.server.model.message.mouse.MouseRelease;
-import com.github.krzychek.iomerge.server.model.message.mouse.MouseWheel;
+import com.github.krzychek.iomerge.server.model.processors.MessageProcessor;
 import com.github.krzychek.iomerge.server.model.serialization.MessageSocketWrapper;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
@@ -28,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @EBean(scope = EBean.Scope.Singleton)
-public class ConnectionHandler extends MessageProcessorAdapter implements ClipboardManager.OnPrimaryClipChangedListener {
+public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnPrimaryClipChangedListener {
 
 	@Bean
 	InputDevice inputDevice;
@@ -96,16 +93,12 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 
 	@Override
 	public void mousePress(MouseButton button) {
-		inputDevice.mousePress(getButton(button));
-	}
-
-	private int getButton(MouseButton button) {
-		return 0;
+		inputDevice.mousePress(0); // TODO
 	}
 
 	@Override
 	public void mouseRelease(MouseButton button) {
-		inputDevice.mouseRelease(getButton(button));
+		inputDevice.mouseRelease(0); // TODO
 	}
 
 	@Override
@@ -161,53 +154,26 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 	}
 
 	@Override
+	public void stringTyped(String s) {
+		Log.e("ConnectionHandler", "WTF I should do with it?! 0o" + s);
+	}
+
+	@Override
+	public void specialKeyClick(SpecialKey specialKey) {
+		Log.e("ConnectionHandler", "WTF I should do with it?! 0o" + specialKey);
+	}
+
+	@Override
 	public void onPrimaryClipChanged() {
 		String clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText().toString();
-		try {
-			socket.sendMessage(new ClipboardSync(clipboardText));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sendMessage(new ClipboardSync(clipboardText));
 	}
 
-	public void sendExit(float v) {
+	public void sendMessage(Message message) {
 		try {
-			socket.sendMessage(new RemoteExit(v));
+			socket.sendMessage(message);
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void sendMouseMove(int x, int y) {
-		try {
-			socket.sendMessage(new MouseMove(x, y));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void sendMousePress(MouseButton button) {
-		try {
-			socket.sendMessage(new MousePress(button));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void sendMouseRelease(MouseButton button) {
-		try {
-			socket.sendMessage(new MouseRelease(button));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-
-	public void sendMouseWheel(int dx) {
-		try {
-			socket.sendMessage(new MouseWheel(dx));
-		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e("ConnectionHandler", "Problem with sending message", e);
 		}
 	}
 
@@ -225,5 +191,14 @@ public class ConnectionHandler extends MessageProcessorAdapter implements Clipbo
 
 	boolean isConnected() {
 		return socket != null && !socket.isClosed();
+	}
+
+	@Override
+	public void heartbeat() { //TODO
+	}
+
+	@Override
+	public void returnToLocal(float v) {
+		throw new IllegalStateException("not implemented");
 	}
 }
