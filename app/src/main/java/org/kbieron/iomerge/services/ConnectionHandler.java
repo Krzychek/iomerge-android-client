@@ -103,6 +103,7 @@ public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnP
 					while (isConnected()) {
 						try {
 							socket.readMessage().process(ConnectionHandler.this);
+							lastHeartbeatTime = System.currentTimeMillis();
 
 						} catch (EOFException e) {
 							disconnect(networkManager);
@@ -221,11 +222,6 @@ public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnP
 
 	boolean isConnected() {
 		return socket != null && !socket.isClosed();
-	}
-
-	@Override
-	public void heartbeat() {
-		lastHeartbeatTime = System.currentTimeMillis();
 	}
 
 	@Override
