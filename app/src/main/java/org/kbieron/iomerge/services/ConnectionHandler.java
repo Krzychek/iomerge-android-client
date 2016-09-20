@@ -2,8 +2,10 @@ package org.kbieron.iomerge.services;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.Toast;
 import com.github.krzychek.iomerge.server.model.Edge;
 import com.github.krzychek.iomerge.server.model.MouseButton;
 import com.github.krzychek.iomerge.server.model.SpecialKey;
@@ -14,6 +16,7 @@ import com.github.krzychek.iomerge.server.model.processors.MessageProcessor;
 import com.github.krzychek.iomerge.server.model.serialization.MessageSocketWrapper;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.SystemService;
 import org.kbieron.iomerge.database.ServerBean;
 import org.kbieron.iomerge.views.EdgeTriggerView;
@@ -27,32 +30,59 @@ import java.util.concurrent.TimeUnit;
 @EBean(scope = EBean.Scope.Singleton)
 public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnPrimaryClipChangedListener {
 
+	private static final int HEARBEAT_DELAY = 2;
+	private static final int HEARTBEAT_TIMEOUT = HEARBEAT_DELAY * 2;
+
 	@Bean
 	InputDevice inputDevice;
 
 	@Bean
 	EdgeTriggerView edgeTrigger;
 
+	@RootContext
+	Context context;
+
 	@SystemService
 	ClipboardManager clipboardManager;
 
 	private MessageSocketWrapper socket;
-	private ScheduledThreadPoolExecutor heartbeatTimer;
+
+	private ScheduledThreadPoolExecutor heartbeatExecutor;
+	private long lastHeartbeatTime;
 
 	private void startHeartbeatTimer(final NetworkManager networkManager) {
+		if (heartbeatExecutor != null) heartbeatExecutor.shutdown();
+
 		final Heartbeat message = new Heartbeat();
-		heartbeatTimer = new ScheduledThreadPoolExecutor(1);
-		heartbeatTimer.scheduleWithFixedDelay(new Runnable() {
+		heartbeatExecutor = new ScheduledThreadPoolExecutor(1);
+
+		heartbeatExecutor.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
 				try {
 					socket.sendMessage(message);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					Log.i("Heartbeattimer", "IOException while sending hearbeat", e);
 					disconnect(networkManager);
 				}
 			}
-		}, 2, 2, TimeUnit.SECONDS);
+		}, 0, HEARBEAT_DELAY, TimeUnit.SECONDS);
+
+
+		lastHeartbeatTime = System.currentTimeMillis();
+		heartbeatExecutor.scheduleWithFixedDelay(new Runnable() {
+			private long lastCall = 0;
+
+			@Override
+			public void run() {
+				if (lastCall > lastHeartbeatTime) {
+					Log.w("ConnectionHandler", "Connection timeout");
+					Toast.makeText(context, "IOMerge: connection timeout", Toast.LENGTH_LONG).show();
+					disconnect(networkManager);
+				}
+				lastCall = System.currentTimeMillis();
+			}
+		}, HEARTBEAT_TIMEOUT, HEARTBEAT_TIMEOUT, TimeUnit.SECONDS);
 	}
 
 
@@ -184,7 +214,7 @@ public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnP
 		}
 		socket = null;
 
-		if (heartbeatTimer != null) heartbeatTimer.shutdownNow();
+		if (heartbeatExecutor != null) heartbeatExecutor.shutdownNow();
 		clipboardManager.removePrimaryClipChangedListener(this);
 		networkManager.disconnect();
 	}
@@ -194,7 +224,8 @@ public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnP
 	}
 
 	@Override
-	public void heartbeat() { //TODO
+	public void heartbeat() {
+		lastHeartbeatTime = System.currentTimeMillis();
 	}
 
 	@Override
