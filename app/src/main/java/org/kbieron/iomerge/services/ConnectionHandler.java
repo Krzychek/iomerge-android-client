@@ -23,6 +23,7 @@ import org.kbieron.iomerge.views.EdgeTriggerView;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -47,20 +48,18 @@ public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnP
 
 	private MessageSocketWrapper socket;
 
-	private ScheduledThreadPoolExecutor heartbeatExecutor;
+	private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+	private ScheduledFuture<?> heartbeatSendingTask;
+	private ScheduledFuture<?> heartbeatTimeoutTask;
+
 	private long lastHeartbeatTime;
 
 	private void startHeartbeatTimer(final NetworkManager networkManager) {
-		if (heartbeatExecutor != null) heartbeatExecutor.shutdown();
-
-		final Heartbeat message = new Heartbeat();
-		heartbeatExecutor = new ScheduledThreadPoolExecutor(1);
-
-		heartbeatExecutor.scheduleWithFixedDelay(new Runnable() {
+		heartbeatSendingTask = executor.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					socket.sendMessage(message);
+					socket.sendMessage(Heartbeat.INSTANCE);
 				} catch (Exception e) {
 					Log.i("Heartbeattimer", "IOException while sending hearbeat", e);
 					disconnect(networkManager);
@@ -68,9 +67,8 @@ public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnP
 			}
 		}, 0, HEARBEAT_DELAY, TimeUnit.SECONDS);
 
-
 		lastHeartbeatTime = System.currentTimeMillis();
-		heartbeatExecutor.scheduleWithFixedDelay(new Runnable() {
+		heartbeatTimeoutTask = executor.scheduleWithFixedDelay(new Runnable() {
 			private long lastCall = 0;
 
 			@Override
@@ -215,7 +213,10 @@ public class ConnectionHandler implements MessageProcessor, ClipboardManager.OnP
 		}
 		socket = null;
 
-		if (heartbeatExecutor != null) heartbeatExecutor.shutdownNow();
+		heartbeatSendingTask.cancel(true);
+		heartbeatTimeoutTask.cancel(true);
+		executor.purge();
+
 		clipboardManager.removePrimaryClipChangedListener(this);
 		networkManager.disconnect();
 	}
