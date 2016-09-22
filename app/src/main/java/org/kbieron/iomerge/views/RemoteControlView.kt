@@ -7,19 +7,19 @@ import android.view.MotionEvent
 import android.view.View
 import com.github.krzychek.iomerge.server.model.MouseButton
 import com.github.krzychek.iomerge.server.model.SpecialKey
+import com.github.krzychek.iomerge.server.model.message.Message
 import com.github.krzychek.iomerge.server.model.message.keyboard.SpecialKeyClick
 import com.github.krzychek.iomerge.server.model.message.keyboard.StringTyped
 import com.github.krzychek.iomerge.server.model.message.mouse.MouseMove
 import com.github.krzychek.iomerge.server.model.message.mouse.MousePress
 import com.github.krzychek.iomerge.server.model.message.mouse.MouseRelease
 import com.github.krzychek.iomerge.server.model.message.mouse.MouseWheel
-import org.kbieron.iomerge.services.ConnectionHandler
 
 
 class RemoteControlView(context: Context, attrs: AttributeSet)
 : View(context, attrs), View.OnTouchListener, View.OnKeyListener {
 
-	lateinit var connectionHandler: ConnectionHandler
+	lateinit var sendMessageFun: (Message) -> Unit?
 
 	init {
 		isFocusable = true
@@ -55,11 +55,11 @@ class RemoteControlView(context: Context, attrs: AttributeSet)
 
 		if (event.pointerCount == 1) {
 			if (currentTime() - lastMutliTouchMove > POINTER_DOWN_CHANGE_DELAY) 3
-			connectionHandler.sendMessage(MouseMove(x - oldX, (y - oldY)))
+			sendMessageFun(MouseMove(x - oldX, (y - oldY)))
 
 		} else if (event.pointerCount == 2) {
 			val yDiff = (event.y - oldY).toInt() / MOUSE_WHEEL_SCALE
-			connectionHandler.sendMessage(MouseWheel(yDiff))
+			sendMessageFun(MouseWheel(yDiff))
 			lastMutliTouchMove = currentTime()
 		}
 
@@ -79,9 +79,9 @@ class RemoteControlView(context: Context, attrs: AttributeSet)
 	}
 
 	private fun sendMouseClick(btn: MouseButton) {
-		connectionHandler.apply {
-			sendMessage(MousePress(btn))
-			sendMessage(MouseRelease(btn))
+		sendMessageFun.apply {
+			sendMessageFun(MousePress(btn))
+			sendMessageFun(MouseRelease(btn))
 		}
 	}
 
@@ -89,20 +89,20 @@ class RemoteControlView(context: Context, attrs: AttributeSet)
 		if (event.action == KeyEvent.ACTION_UP) {
 			val unicodeChar = event.unicodeChar
 			if (unicodeChar != 0)
-				connectionHandler.sendMessage(StringTyped(String(intArrayOf(unicodeChar), 0, 1)))
+				sendMessageFun(StringTyped(String(intArrayOf(unicodeChar), 0, 1)))
 			else {
 				processSpecialKey(keyCode)
 			}
 
 		} else if (event.action == KeyEvent.ACTION_MULTIPLE)
-			connectionHandler.sendMessage(StringTyped(event.characters))
+			sendMessageFun(StringTyped(event.characters))
 
 		return false
 	}
 
 	private fun processSpecialKey(keyCode: Int) {
 		when (keyCode) {
-			KeyEvent.KEYCODE_DEL -> connectionHandler.sendMessage(SpecialKeyClick(SpecialKey.BACKSPACE))
+			KeyEvent.KEYCODE_DEL -> sendMessageFun(SpecialKeyClick(SpecialKey.BACKSPACE))
 		}
 	}
 
@@ -110,5 +110,6 @@ class RemoteControlView(context: Context, attrs: AttributeSet)
 		private val MOUSE_WHEEL_SCALE = -10
 		private val POINTER_DOWN_CHANGE_DELAY = 100
 	}
+
 
 }

@@ -3,29 +3,22 @@ package org.kbieron.iomerge.services
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
+import com.github.krzychek.iomerge.server.model.message.Message
 import com.pawegio.kandroid.i
 import com.pawegio.kandroid.w
 import org.kbieron.iomerge.database.ServerBean
 import org.kbieron.iomerge.notifications.NotificationFactory
-import org.kbieron.iomerge.views.EdgeTrigger
 
 
 open class NetworkManager : Service() {
 
-	private val inputDevice
-			by lazy { InputDevice(applicationContext) }
-
-	private val connectionHandler
-			by lazy { ConnectionHandler(applicationContext, inputDevice) }
-
-	private val edgeTriggerView: EdgeTrigger
-			by lazy { EdgeTrigger(applicationContext, connectionHandler) }
+	private var connectionHandler: ConnectionHandler? = null
 
 	override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
 		if (intent != null && intent.action != null)
 			when (intent.action) {
-				DISCONNECT_ACTION -> disconnect()
+				DISCONNECT_ACTION -> connectionHandler?.disconnect()
 				CONNECT_ACTION -> connect(intent.getSerializableExtra(SERVER_EXTRA) as ServerBean)
 				else -> w("Uknown intent action: ${intent.action}")
 			}
@@ -35,34 +28,29 @@ open class NetworkManager : Service() {
 
 	override fun onBind(intent: Intent): Binder = NetworkManagerBinder()
 
-	override fun onDestroy() = disconnect()
-
-	internal fun connect(server: ServerBean) {
-		if (!connectionHandler.isConnected) {
-
-			// connect
-			connectionHandler.connect(server, this)
-			// show notification
-			startForeground(1, NotificationFactory(applicationContext).serverConnected(server))
-			// showEdgeTrigger
-			edgeTriggerView.show()
-
-		} else {
-			i("already connected")
-		}
-
+	override fun onDestroy() {
+		connectionHandler?.disconnect()
 	}
 
-	fun disconnect() {
-		i("Disconnecting")
-		edgeTriggerView.hide()
-		inputDevice.stop()
-		stopForeground(true)
+	internal fun connect(server: ServerBean) {
+		if (connectionHandler != null)
+			i("already connected")
+		else {
+			connectionHandler = ConnectionHandler(
+					context = applicationContext,
+					server = server,
+					disconnectClbk = {
+						i("Disconnecting")
+						stopForeground(true)
+						connectionHandler = null
+					}
+			)
+			startForeground(1, NotificationFactory(applicationContext).serverConnected(server))
+		}
 	}
 
 	inner class NetworkManagerBinder : Binder() {
-		val connectionHandler: ConnectionHandler
-			get() = this@NetworkManager.connectionHandler
+		val sendMessageFun = { message: Message -> connectionHandler?.sendMessage(message) }
 	}
 
 	companion object {
