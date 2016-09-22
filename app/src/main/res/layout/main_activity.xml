@@ -14,7 +14,7 @@
 
 	<fragment
 			android:id="@+id/list_fragment_main"
-			android:name="org.kbieron.iomerge.fragments.ServerListFragment_"
+			android:name="org.kbieron.iomerge.fragments.ServerListFragment"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			tools:layout="@layout/server_list_fragment_layout"/>
