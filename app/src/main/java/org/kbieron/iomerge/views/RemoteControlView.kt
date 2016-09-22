@@ -54,8 +54,8 @@ class RemoteControlView(context: Context, attrs: AttributeSet)
 		val x = event.x.toInt()
 
 		if (event.pointerCount == 1) {
-			if (currentTime() - lastMutliTouchMove > POINTER_DOWN_CHANGE_DELAY) 3
-			sendMessageFun(MouseMove(x - oldX, (y - oldY)))
+			if (currentTime() - lastMutliTouchMove > POINTER_DOWN_CHANGE_DELAY)
+				sendMessageFun(MouseMove(x - oldX, y - oldY))
 
 		} else if (event.pointerCount == 2) {
 			val yDiff = (event.y - oldY).toInt() / MOUSE_WHEEL_SCALE
