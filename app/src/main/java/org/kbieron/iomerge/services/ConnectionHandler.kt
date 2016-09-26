@@ -83,6 +83,8 @@ class ConnectionHandler(context: Context, server: ServerBean,
 
 			}
 		}
+
+		edgeTrigger.show()
 	}
 
 	override fun onPrimaryClipChanged() {
