@@ -2,7 +2,6 @@ package org.kbieron.iomerge.fragments
 
 import android.app.Fragment
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
@@ -10,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.pawegio.kandroid.IntentFor
-import kotterknife.bindView
+import kotlinx.android.synthetic.main.server_list_fragment_layout.*
 import org.kbieron.iomerge.android.R
 import org.kbieron.iomerge.database.ServerBean
 import org.kbieron.iomerge.database.ServerDAO
@@ -18,10 +17,6 @@ import org.kbieron.iomerge.services.NetworkManager
 
 
 open class ServerListFragment : Fragment(), OnServerListAdapter.ItemClickListener {
-
-	private val recyclerView by bindView<RecyclerView>(R.id.server_list_view)
-
-	private val floatingActionButton by bindView<FloatingActionButton>(R.id.fab)
 
 	private val serverDAO by lazy { ServerDAO(activity) }
 
@@ -37,15 +32,15 @@ open class ServerListFragment : Fragment(), OnServerListAdapter.ItemClickListene
 	}
 
 	private fun createList() {
-		recyclerView.apply {
+		server_list_view.apply {
 			adapter = listAdapter
 			layoutManager = LinearLayoutManager(activity)
 		}
-		ItemTouchHelper(SwipeCallback()).attachToRecyclerView(recyclerView)
+		ItemTouchHelper(SwipeCallback()).attachToRecyclerView(server_list_view)
 	}
 
 	private fun setupFAB() {
-		floatingActionButton.apply {
+		floating_btn.apply {
 			setOnClickListener {
 				val addServerDialogFragment = AddServerDialogFragment()
 				addServerDialogFragment.show(fragmentManager, "add server")
