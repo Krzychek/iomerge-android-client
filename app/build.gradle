@@ -72,7 +72,7 @@ dependencies {
 	// kotlin libs
 	compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 	compile 'com.pawegio.kandroid:kandroid:0.6.12@aar'
-	compile 'com.github.JakeWharton:kotterknife:-SNAPSHOT'
+	compile 'com.github.JakeWharton:kotterknife:fe90797a31'
 	compile 'com.chibatching:kotpref:1.4.0'
 
 	// com.android.support
