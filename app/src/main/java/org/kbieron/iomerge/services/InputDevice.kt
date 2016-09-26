@@ -9,7 +9,7 @@ import java.lang.Runtime.getRuntime
 class InputDevice(private val context: Context) {
 
 	private val DAEMON_NAME = "iomerge_daemon"
-	private var coppied = false
+	private var daemonPrepared = false
 
 	init {
 		System.loadLibrary("native")
@@ -20,18 +20,9 @@ class InputDevice(private val context: Context) {
 	@Synchronized @Throws(IOException::class, InterruptedException::class)
 	internal fun startNativeDaemon() {
 		stop()
-
-		if (!coppied) {
-			FileOutputStream(daemonOutFile).use {
-				copy(context.assets.open(DAEMON_NAME), it)
-			}
-		}
+		prepareDaemon()
 
 		try {
-			getRuntime().exec(arrayOf("su", "-C", "chmod 777 ${daemonOutFile.absolutePath}")).waitFor()
-			coppied = true
-			initializePipe()
-
 			getRuntime().exec(arrayOf("su", "-C", daemonOutFile.absolutePath)).apply {
 				Thread.sleep(100)
 				val exitValue = exitValue() // throws IllegalThreadStateException if process was started
@@ -41,6 +32,17 @@ class InputDevice(private val context: Context) {
 			// it means process was started succesfully
 		}
 
+	}
+
+	private fun prepareDaemon() {
+		if (!daemonPrepared) {
+			FileOutputStream(daemonOutFile).use {
+				copy(context.assets.open(DAEMON_NAME), it)
+			}
+			getRuntime().exec(arrayOf("su", "-C", "chmod 777 ${daemonOutFile.absolutePath}")).waitFor()
+			initializePipe()
+			daemonPrepared = true
+		}
 	}
 
 	@Synchronized internal fun stop() {
