@@ -78,10 +78,8 @@ class RemoteControlView(context: Context, attrs: AttributeSet)
 	}
 
 	private fun sendMouseClick(btn: MouseButton) {
-		sendMessageFun.apply {
-			sendMessageFun(MousePress(btn))
-			sendMessageFun(MouseRelease(btn))
-		}
+		sendMessageFun(MousePress(btn))
+		sendMessageFun(MouseRelease(btn))
 	}
 
 	override fun onKey(v: View, keyCode: Int, event: KeyEvent): Boolean {
