@@ -14,6 +14,7 @@ import com.github.krzychek.iomerge.server.model.message.mouse.MouseMove
 import com.github.krzychek.iomerge.server.model.message.mouse.MousePress
 import com.github.krzychek.iomerge.server.model.message.mouse.MouseRelease
 import com.github.krzychek.iomerge.server.model.message.mouse.MouseWheel
+import java.lang.System.currentTimeMillis
 
 
 class RemoteControlView(context: Context, attrs: AttributeSet)
@@ -54,20 +55,18 @@ class RemoteControlView(context: Context, attrs: AttributeSet)
 		val x = event.x.toInt()
 
 		if (event.pointerCount == 1) {
-			if (currentTime() - lastMutliTouchMove > POINTER_DOWN_CHANGE_DELAY)
+			if (currentTimeMillis() - lastMutliTouchMove > POINTER_DOWN_CHANGE_DELAY)
 				sendMessageFun(MouseMove(x - oldX, y - oldY))
 
 		} else if (event.pointerCount == 2) {
 			val yDiff = (event.y - oldY).toInt() / MOUSE_WHEEL_SCALE
 			sendMessageFun(MouseWheel(yDiff))
-			lastMutliTouchMove = currentTime()
+			lastMutliTouchMove = currentTimeMillis()
 		}
 
 		oldX = x
 		oldY = y
 	}
-
-	private fun currentTime() = System.currentTimeMillis()
 
 	private fun onClick(pointerCount: Int) {
 		if (pointerCount == 1)
