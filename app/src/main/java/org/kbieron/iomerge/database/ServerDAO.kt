@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import com.pawegio.kandroid.e
 import org.kbieron.iomerge.database.MySQLiteServerOpenHelper.Companion.ADDRESS_COL
 import org.kbieron.iomerge.database.MySQLiteServerOpenHelper.Companion.COLUMNS
 import org.kbieron.iomerge.database.MySQLiteServerOpenHelper.Companion.ID_COL
@@ -20,8 +21,8 @@ open class ServerDAO(context: Context) {
 	private val onServerAddedListeners = Collections.newSetFromMap(WeakHashMap<OnServerAddedListener, Boolean>())
 
 
-	private fun <T> doWithDb(callback: SQLiteDatabase.() -> T): T {
-		val result = dbHelper.writableDatabase.run(callback)
+	private fun <T> doWithDb(writable: Boolean = false, callback: SQLiteDatabase.() -> T): T {
+		val result = if (writable) dbHelper.writableDatabase.run(callback) else dbHelper.readableDatabase.run(callback)
 		dbHelper.close()
 		return result
 	}
@@ -29,44 +30,50 @@ open class ServerDAO(context: Context) {
 
 	fun createServer(address: String, port: Int): ServerBean? {
 
-		val insertId = doWithDb {
-			insert(TABLE, null, ContentValues().apply {
+		val insertId = doWithDb(writable = true) {
+			insert(TABLE, null, ContentValues(2).apply {
 				put(ADDRESS_COL, address)
 				put(PORT_COL, port)
 			})
 		}
 
-		return if (insertId == -1L) null
-		else ServerBean(insertId, address, port).apply {
-			onServerAddedListeners.forEach { it.onServerAdded(this) }
+		if (insertId == -1L) {
+			e("Problem while creating new server")
+			return null
+
+		} else {
+			return ServerBean(insertId, address, port).apply {
+				onServerAddedListeners.forEach { it.onServerAdded(this) }
+			}
 		}
 	}
 
 	fun deleteServer(server: ServerBean) {
-		doWithDb { delete(TABLE, "$ID_COL = ${server.id}", null) }
+		doWithDb(writable = true) {
+			delete(TABLE, "$ID_COL = ${server.id}", null)
+		}
 	}
 
 	val allServers: MutableList<ServerBean>
-		get() {
-			val servers = ArrayList<ServerBean>()
-			doWithDb {
-				this.query(TABLE, COLUMNS.toTypedArray()).apply {
-					moveToFirst()
+		get() = doWithDb {
+			query(TABLE, COLUMNS).let {
+				it.moveToFirst()
 
-					while (!isAfterLast) {
-						servers.add(this.getServer())
-						moveToNext()
-					}
-				}.close()
-
+				val servers = ArrayList<ServerBean>(it.count)
+				while (!it.isAfterLast) {
+					servers.add(it.getServer())
+					it.moveToNext()
+				}
+				it.close()
+				servers
 			}
-			return servers
 		}
 
+
 	private fun Cursor.getServer(): ServerBean {
-		val id = getLong(COLUMNS.indexOf(ID_COL))
-		val address = getString(COLUMNS.indexOf(ADDRESS_COL))
-		val port = getInt(COLUMNS.indexOf(PORT_COL))
+		val id = getLong(getColumnIndex(ID_COL))
+		val address = getString(getColumnIndex(ADDRESS_COL))
+		val port = getInt(getColumnIndex(PORT_COL))
 
 		return ServerBean(id, address, port)
 	}

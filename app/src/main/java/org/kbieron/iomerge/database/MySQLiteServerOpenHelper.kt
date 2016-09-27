@@ -3,7 +3,6 @@ package org.kbieron.iomerge.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import java.util.*
 
 
 class MySQLiteServerOpenHelper internal constructor(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -23,7 +22,7 @@ class MySQLiteServerOpenHelper internal constructor(context: Context) : SQLiteOp
 		internal val ID_COL = "_id"
 		internal val ADDRESS_COL = "address"
 		internal val PORT_COL = "port"
-		internal val COLUMNS = Arrays.asList(ID_COL, ADDRESS_COL, PORT_COL)
+		internal val COLUMNS = arrayOf(ID_COL, ADDRESS_COL, PORT_COL)
 
 		private val DATABASE_NAME = "servers.db"
 
