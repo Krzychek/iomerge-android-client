@@ -34,6 +34,12 @@ open class NetworkManager : Service() {
 		connectionHandler?.disconnect()
 	}
 
+	private val disconnectCallback = {
+		i("Disconnecting")
+		stopForeground(true)
+		connectionHandler = null
+	}
+
 	internal fun connect(server: ServerBean) = runAsync {
 		Looper.prepare()
 		if (connectionHandler != null)
@@ -42,11 +48,7 @@ open class NetworkManager : Service() {
 			connectionHandler = ConnectionHandler(
 					context = applicationContext,
 					server = server,
-					disconnectClbk = {
-						i("Disconnecting")
-						stopForeground(true)
-						connectionHandler = null
-					}
+					disconnectClbk = disconnectCallback
 			)
 			startForeground(1, NotificationFactory(applicationContext).serverConnected(server))
 		}
