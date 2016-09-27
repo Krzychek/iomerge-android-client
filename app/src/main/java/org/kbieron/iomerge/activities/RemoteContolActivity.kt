@@ -30,7 +30,10 @@ open class RemoteContolActivity : Activity() {
 		super.onStart()
 
 		bindService(IntentFor<NetworkManager>(this), object : ServiceConnection {
-			override fun onServiceDisconnected(name: ComponentName?) = Unit
+			override fun onServiceDisconnected(name: ComponentName?) {
+				this@RemoteContolActivity.finish()
+			}
+
 			override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
 				val networkManagerBinder = service as NetworkManager.NetworkManagerBinder
 				remote_control_view.sendMessageFun = networkManagerBinder.sendMessageFun
