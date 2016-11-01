@@ -36,12 +36,12 @@ gradle.projectsEvaluated {
 
 model {
 	android {
-		compileSdkVersion = 24
-		buildToolsVersion = "24.0.2"
+		compileSdkVersion = 25
+		buildToolsVersion = "25.0.0"
 
 		defaultConfig.with {
 			minSdkVersion.apiLevel = 15
-			targetSdkVersion.apiLevel = 24
+			targetSdkVersion.apiLevel = 25
 			versionCode = 1
 			versionName = "1.0"
 		}
