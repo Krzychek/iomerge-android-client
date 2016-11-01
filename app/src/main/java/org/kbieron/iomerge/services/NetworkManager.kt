@@ -8,11 +8,13 @@ import com.github.krzychek.iomerge.server.model.message.Message
 import com.pawegio.kandroid.i
 import com.pawegio.kandroid.runAsync
 import com.pawegio.kandroid.w
+import org.kbieron.iomerge.ConnectionState
+import org.kbieron.iomerge.IOMergeApp
 import org.kbieron.iomerge.database.ServerBean
 import org.kbieron.iomerge.notifications.NotificationFactory
 
 
-open class NetworkManager : Service() {
+class NetworkManager : Service() {
 
 	private var connectionHandler: ConnectionHandler? = null
 
@@ -32,12 +34,14 @@ open class NetworkManager : Service() {
 
 	override fun onDestroy() {
 		connectionHandler?.disconnect()
+		(application as IOMergeApp).connectionState = ConnectionState.DISCONNECTED
 	}
 
 	private val disconnectCallback = {
 		i("Disconnecting")
 		stopForeground(true)
 		connectionHandler = null
+		(application as IOMergeApp).connectionState = ConnectionState.DISCONNECTED
 	}
 
 	internal fun connect(server: ServerBean) = runAsync {
@@ -50,6 +54,7 @@ open class NetworkManager : Service() {
 					server = server,
 					disconnectClbk = disconnectCallback
 			)
+			(application as IOMergeApp).connectionState = ConnectionState.CONNECTED
 			startForeground(1, NotificationFactory(applicationContext).serverConnected(server))
 		}
 	}
