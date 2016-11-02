@@ -6,10 +6,10 @@ import android.content.Context
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationCompat.PRIORITY_LOW
 import com.pawegio.kandroid.IntentFor
-import org.kbieron.iomerge.activities.MainActivity
-import org.kbieron.iomerge.activities.RemoteContolActivity
 import org.kbieron.iomerge.android.R
 import org.kbieron.iomerge.database.ServerBean
+import org.kbieron.iomerge.gui.main.MainActivity
+import org.kbieron.iomerge.gui.remoteControl.RemoteContolActivity
 import org.kbieron.iomerge.services.NetworkManager
 
 

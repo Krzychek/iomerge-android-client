@@ -1,4 +1,4 @@
-package org.kbieron.iomerge.views
+package org.kbieron.iomerge.gui.remoteControl
 
 import android.view.MotionEvent
 import android.view.View

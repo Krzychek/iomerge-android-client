@@ -11,4 +11,5 @@
 	<string name="address_label">Adres:</string>
 	<string name="port_label">Port:</string>
 	<string name="add_server_dialog_header">dodaj server</string>
+	<string name="remote_control">zdalne sterowanie</string>
 </resources>

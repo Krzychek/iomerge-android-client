@@ -4,14 +4,15 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.Looper
+import android.widget.Toast
 import com.github.krzychek.iomerge.server.model.message.Message
 import com.pawegio.kandroid.i
 import com.pawegio.kandroid.runAsync
 import com.pawegio.kandroid.w
-import org.kbieron.iomerge.ConnectionState
 import org.kbieron.iomerge.IOMergeApp
 import org.kbieron.iomerge.database.ServerBean
 import org.kbieron.iomerge.notifications.NotificationFactory
+import java.net.ConnectException
 
 
 class NetworkManager : Service() {
@@ -34,28 +35,32 @@ class NetworkManager : Service() {
 
 	override fun onDestroy() {
 		connectionHandler?.disconnect()
-		(application as IOMergeApp).connectionState = ConnectionState.DISCONNECTED
+		(application as IOMergeApp).connectedServer = null
 	}
 
 	private val disconnectCallback = {
 		i("Disconnecting")
 		stopForeground(true)
 		connectionHandler = null
-		(application as IOMergeApp).connectionState = ConnectionState.DISCONNECTED
+		(application as IOMergeApp).connectedServer = null
 	}
 
 	internal fun connect(server: ServerBean) = runAsync {
 		Looper.prepare()
 		if (connectionHandler != null)
-			i("already connected")
-		else {
+			w("already connected")
+		else try {
 			connectionHandler = ConnectionHandler(
 					context = applicationContext,
 					server = server,
 					disconnectClbk = disconnectCallback
 			)
-			(application as IOMergeApp).connectionState = ConnectionState.CONNECTED
+			(application as IOMergeApp).connectedServer = server
 			startForeground(1, NotificationFactory(applicationContext).serverConnected(server))
+
+		} catch (e: ConnectException) {
+			Toast.makeText(applicationContext, "Not able to connect to: ${server.address}:${server.port}", Toast.LENGTH_LONG)
+					.show()
 		}
 	}
 

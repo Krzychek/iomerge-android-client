@@ -10,7 +10,7 @@ import com.github.krzychek.iomerge.server.model.message.misc.Heartbeat
 import com.github.krzychek.iomerge.server.model.serialization.MessageSocketWrapper
 import com.pawegio.kandroid.*
 import org.kbieron.iomerge.database.ServerBean
-import org.kbieron.iomerge.views.EdgeTrigger
+import org.kbieron.iomerge.gui.main.EdgeTrigger
 import java.io.EOFException
 import java.io.IOException
 import java.util.concurrent.ScheduledFuture
@@ -102,6 +102,7 @@ class ConnectionHandler(context: Context, server: ServerBean,
 
 	fun disconnect() {
 		if (!isConnected) return
+		isConnected = false
 		i("Disconnecting")
 		edgeTrigger.hide()
 		inputDevice.stop()

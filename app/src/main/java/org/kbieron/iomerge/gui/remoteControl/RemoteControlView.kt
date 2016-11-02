@@ -1,4 +1,4 @@
-package org.kbieron.iomerge.views
+package org.kbieron.iomerge.gui.remoteControl
 
 import android.content.Context
 import android.util.AttributeSet
@@ -33,7 +33,7 @@ class RemoteControlView(context: Context, attrs: AttributeSet)
 	private var oldY: Int = 0
 	private var lastMutliTouchMove: Long = 0
 
-	private fun createOnTouchListener(): View.OnTouchListener {
+	private fun createOnTouchListener(): OnTouchListener {
 		val multiClickDetector = MultiClickDetector({ pointeCount -> onClick(pointeCount) })
 		return OnTouchListenerChain(this, multiClickDetector)
 	}

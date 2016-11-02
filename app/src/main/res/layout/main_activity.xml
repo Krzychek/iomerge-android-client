@@ -9,14 +9,7 @@
 		android:paddingRight="@dimen/activity_horizontal_margin"
 		android:paddingTop="@dimen/activity_vertical_margin"
 		xmlns:tools="http://schemas.android.com/tools"
-		tools:context="org.kbieron.iomerge.activities.MainActivity">
+		tools:context="org.kbieron.iomerge.gui.main.MainActivity">
 
-
-	<fragment
-			android:id="@+id/list_fragment_main"
-			android:name="org.kbieron.iomerge.fragments.ServerListFragment"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			tools:layout="@layout/server_list_fragment_layout"/>
 
 </RelativeLayout>

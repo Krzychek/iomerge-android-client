@@ -1,4 +1,4 @@
-package org.kbieron.iomerge.views
+package org.kbieron.iomerge.gui.main
 
 import android.content.Context
 import android.graphics.PixelFormat

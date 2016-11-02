@@ -1,4 +1,4 @@
-package org.kbieron.iomerge.fragments
+package org.kbieron.iomerge.gui.main.serverList
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
